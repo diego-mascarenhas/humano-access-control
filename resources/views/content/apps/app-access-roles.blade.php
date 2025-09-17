@@ -52,6 +52,33 @@ document.addEventListener('DOMContentLoaded', function ()
 			});
 		}
 	});
+
+	// Yajra DataTable for Roles list (optional separate table)
+	if (document.getElementById('rolesListTable'))
+	{
+		$('#rolesListTable').DataTable({
+			processing: true,
+			serverSide: true,
+			ajax: '{{ route('app-access-roles.list-data') }}',
+			columns: [
+				{ data: 'name', title: '{{ __('Rol') }}' },
+				{ data: 'users_count', title: '{{ __('Usuarios') }}', className: 'text-center' },
+				{ data: 'permissions_count', title: '{{ __('Permisos') }}', className: 'text-center' }
+			],
+			dom: '<"row mx-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+			language: {
+				sProcessing: 'Procesando...',
+				sLengthMenu: 'Mostrar _MENU_',
+				sZeroRecords: 'No se encontraron resultados',
+				sEmptyTable: 'Sin datos disponibles',
+				sInfo: 'Mostrando _START_ a _END_ de _TOTAL_',
+				sInfoEmpty: 'Mostrando 0 a 0 de 0',
+				sInfoFiltered: '(filtrado de _MAX_)',
+				sSearch: 'Buscar',
+				oPaginate: { sFirst: 'Primero', sLast: 'Último', sNext: 'Siguiente', sPrevious: 'Anterior' }
+			}
+		});
+	}
 });
 </script>
 @endsection
@@ -84,6 +111,15 @@ document.addEventListener('DOMContentLoaded', function ()
     </div>
   </div>
   @endforeach
+
+  <!-- Optional: Roles list table (Yajra) -->
+  <div class="col-12">
+    <div class="card mt-4">
+      <div class="card-datatable table-responsive">
+        <table id="rolesListTable" class="table w-100"></table>
+      </div>
+    </div>
+  </div>
 
   <div class="col-12">
     <div class="card mt-4">

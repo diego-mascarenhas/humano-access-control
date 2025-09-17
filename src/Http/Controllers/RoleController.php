@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\User;
+use Yajra\DataTables\DataTables;
 
 class RoleController
 {
@@ -130,6 +131,26 @@ class RoleController
 			{
 				$modules[$module]['createPerms'][] = $perm;
 			}
+
+	/**
+	 * Yajra DataTables: Roles list (name, users_count, permissions_count)
+	 */
+	public function listData(Request $request)
+	{
+		$query = Role::query()
+			->select(['id', 'name'])
+			->withCount('permissions')
+			->selectSub(
+				DB::table('model_has_roles')
+					->selectRaw('count(*)')
+					->whereColumn('model_has_roles.role_id', 'roles.id'),
+				'users_count'
+			)
+			->orderBy('name');
+
+		return DataTables::of($query)
+			->toJson();
+	}
 		}
 
 		// Compute checked flags
