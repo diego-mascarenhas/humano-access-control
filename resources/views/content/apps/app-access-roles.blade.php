@@ -12,9 +12,43 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('vendor-script')
+<script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
 @endsection
 
 @section('page-script')
+<script>
+document.addEventListener('DOMContentLoaded', function ()
+{
+	$('.roles-table').DataTable({
+		processing: true,
+		serverSide: false,
+		ajax: '{{ route('app-access-roles.data') }}',
+		columns: [
+			{ data: 'name', title: '{{ __('Role') }}' },
+			{ data: 'users_count', title: '{{ __('Users') }}', className: 'text-center' },
+			{ data: 'permissions_count', title: '{{ __('Permissions') }}', className: 'text-center' },
+			{ data: null, orderable: false, searchable: false, className: 'text-center',
+				render: function ()
+				{
+					return `<div class="d-flex justify-content-center align-items-center">
+						<a href="javascript:;" class="text-body"><i class="ti ti-edit ti-sm me-2"></i></a>
+						<a href="javascript:;" class="text-danger"><i class="ti ti-trash ti-sm"></i></a>
+					</div>`;
+				}
+			}
+		],
+		drawCallback: function ()
+		{
+			$("#rolesTable tbody tr").css({
+				"user-select": "none",
+				"-webkit-user-select": "none",
+				"-moz-user-select": "none",
+				"-ms-user-select": "none"
+			});
+		}
+	});
+});
+</script>
 @endsection
 
 @section('content')
@@ -113,26 +147,9 @@ $configData = Helper::appClasses();
 
   <div class="col-12">
     <div class="card">
-      <h5 class="card-header">{{ __('Users by role') }}</h5>
+      <h5 class="card-header">{{ __('Roles') }}</h5>
       <div class="table-responsive">
-        <table class="table border-top dataTable">
-          <thead>
-            <tr>
-              <th>{{ __('User') }}</th>
-              <th>{{ __('Role') }}</th>
-              <th class="text-center">{{ __('Status') }}</th>
-              <th class="text-center">{{ __('Actions') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>john@example.com</td>
-              <td>Administrator</td>
-              <td class="text-center"><span class="badge bg-label-success">Active</span></td>
-              <td class="text-center"><a href="javascript:;" class="text-body"><i class="ti ti-edit ti-sm me-2"></i></a><a href="javascript:;" class="text-danger"><i class="ti ti-trash ti-sm"></i></a></td>
-            </tr>
-          </tbody>
-        </table>
+        <table id="rolesTable" class="table border-top roles-table"></table>
       </div>
     </div>
   </div>
