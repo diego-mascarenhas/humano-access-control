@@ -21,12 +21,11 @@ document.addEventListener('DOMContentLoaded', function ()
 		ajax: '{{ route('app-access-permission.data') }}',
 		columns: [
 			{ data: 'name', title: '{{ __('Nombre') }}', render: function (val)
-				{ return `<span class=\"fw-medium\">${val}</span>`; }
+				{ return `<span class="fw-medium">${val}</span>`; }
 			},
-			{ data: 'assigned_to', title: '{{ __('Asignado a') }}', className: 'text-center', orderable: false, searchable: false },
-			{ data: 'created_at', title: '{{ __('Fecha de creación') }}', className: 'text-center' },
-			{ data: 'actions', title: '{{ __('Acciones') }}', className: 'text-center', orderable: false, searchable: false }
+			{ data: 'assigned_to', title: '{{ __('Asignado a') }}', className: 'text-center', orderable: false, searchable: false }
 		],
+		dom: '<"row mx-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
 		language: {
 			sProcessing: 'Procesando...',
 			sLengthMenu: 'Mostrar _MENU_',
@@ -52,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function ()
 </div>
 
 <div class="card">
-	<h5 class="card-header">{{ __('Permissions') }}</h5>
     <div class="card-datatable table-responsive">
         <table class="table permissions-table w-100"></table>
     </div>
