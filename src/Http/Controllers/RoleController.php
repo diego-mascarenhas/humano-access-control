@@ -5,7 +5,9 @@ namespace Idoneo\HumanoAccessControl\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
+use App\Models\User;
 
 class RoleController
 {
@@ -36,6 +38,37 @@ class RoleController
 
 		return response()->json([
 			'data' => $roles,
+		]);
+	}
+
+	public function usersData(): JsonResponse
+	{
+		$users = User::query()
+			->with('roles:id,name')
+			->orderBy('name')
+			->get()
+			->map(function (User $user)
+			{
+				$status = 'Pending';
+				if ($user->deleted_at)
+				{
+					$status = 'Inactive';
+				}
+				elseif ($user->email_verified_at)
+				{
+					$status = 'Active';
+				}
+
+				return [
+					'name' => $user->name,
+					'email' => $user->email,
+					'role' => $user->roles->pluck('name')->first() ?? '-',
+					'status' => $status,
+				];
+			});
+
+		return response()->json([
+			'data' => $users,
 		]);
 	}
 }

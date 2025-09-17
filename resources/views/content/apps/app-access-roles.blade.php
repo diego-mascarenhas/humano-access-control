@@ -47,6 +47,40 @@ document.addEventListener('DOMContentLoaded', function ()
 			});
 		}
 	});
+
+	$('.users-table').DataTable({
+		processing: true,
+		serverSide: false,
+		ajax: '{{ route('app-access-roles.users-data') }}',
+		columns: [
+			{ data: null, title: '{{ __('User') }}', render: function (row)
+				{
+					return `<div class="d-flex align-items-center">
+						<div class="d-flex flex-column">
+							<span class="fw-medium">${row.name}</span>
+							<small class="text-muted">${row.email}</small>
+						</div>
+					</div>`;
+				}
+			},
+			{ data: 'role', title: '{{ __('Role') }}' },
+			{ data: 'status', title: '{{ __('Status') }}', className: 'text-center', render: function (val)
+				{
+					const map = { 'Active': 'bg-label-success', 'Pending': 'bg-label-warning', 'Inactive': 'bg-label-secondary' };
+					return `<span class="badge ${map[val] || 'bg-label-secondary'}">${val}</span>`;
+				}
+			}
+		],
+		drawCallback: function ()
+		{
+			$("#usersByRoleTable tbody tr").css({
+				"user-select": "none",
+				"-webkit-user-select": "none",
+				"-moz-user-select": "none",
+				"-ms-user-select": "none"
+			});
+		}
+	});
 });
 </script>
 @endsection
@@ -150,6 +184,15 @@ document.addEventListener('DOMContentLoaded', function ()
       <h5 class="card-header">{{ __('Roles') }}</h5>
       <div class="card-datatable table-responsive">
         <table id="rolesTable" class="table roles-table"></table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card mt-4">
+      <h5 class="card-header">{{ __('Users by role') }}</h5>
+      <div class="card-datatable table-responsive">
+        <table id="usersByRoleTable" class="table users-table"></table>
       </div>
     </div>
   </div>
