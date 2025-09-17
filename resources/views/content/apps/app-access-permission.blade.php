@@ -21,9 +21,9 @@ document.addEventListener('DOMContentLoaded', function ()
 		ajax: '{{ route('app-access-permission.data') }}',
 		columns: [
 			{ data: 'name', title: '{{ __('Nombre') }}', render: function (val)
-				{ return `<span class="fw-medium">${val}</span>`; }
+				{ return `<span class=\"fw-medium\">${val}</span>`; }
 			},
-			{ data: 'guard_name', title: '{{ __('Guardia') }}', className: 'text-center' },
+			{ data: 'assigned_to', title: '{{ __('Asignado a') }}', className: 'text-center', orderable: false, searchable: false },
 			{ data: 'created_at', title: '{{ __('Fecha de creación') }}', className: 'text-center' },
 			{ data: 'actions', title: '{{ __('Acciones') }}', className: 'text-center', orderable: false, searchable: false }
 		],

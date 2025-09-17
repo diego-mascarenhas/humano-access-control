@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function ()
     <div class="card mt-4">
       <h5 class="card-header">{{ __('Usuarios por rol') }}</h5>
       <div class="card-datatable table-responsive">
-        <table id="usersByRoleTable" class="table users-table"></table>
+        <table id="usersByRoleTable" class="table users-table w-100"></table>
       </div>
     </div>
   </div>

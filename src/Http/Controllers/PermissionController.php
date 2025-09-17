@@ -13,16 +13,30 @@ class PermissionController
 		return view('humano-access-control::content.apps.app-access-permission');
 	}
 
-	public function data(Request $request)
+    public function data(Request $request)
 	{
-		$query = Permission::query()->select(['id', 'name', 'guard_name', 'created_at']);
+        $query = Permission::query()
+            ->with('roles:id,name')
+            ->select(['id', 'name', 'guard_name', 'created_at']);
 
 		return DataTables::of($query)
+            ->addColumn('assigned_to', function (Permission $permission)
+            {
+                if ($permission->roles->isEmpty())
+                {
+                    return '<span class="text-muted">-</span>';
+                }
+
+                return $permission->roles->map(function ($role)
+                {
+                    return '<span class="badge bg-label-secondary me-1">'.e($role->name).'</span>';
+                })->implode(' ');
+            })
 			->addColumn('actions', function (Permission $permission)
 			{
 				return view('humano-access-control::components.permissions.actions', compact('permission'))->render();
 			})
-			->rawColumns(['actions'])
+            ->rawColumns(['assigned_to', 'actions'])
 			->toJson();
 	}
 }
