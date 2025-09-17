@@ -150,13 +150,13 @@ document.addEventListener('DOMContentLoaded', function ()
 
 				// Header row: Administrator Access + Select All
 				const headerRow = document.createElement('div');
-				headerRow.className = 'row g-0 align-items-center pb-2';
+				headerRow.className = 'row g-0 align-items-center py-3 border-bottom';
 				headerRow.innerHTML = `
-					<div class="col-md-4 mb-2">
+					<div class="col-6 col-md-4 mb-2">
 						<strong>{{ __('Administrator Access') }}</strong>
 						<i class="ti ti-info-circle ms-1 text-muted"></i>
 					</div>
-					<div class="col-md-8">
+					<div class="col-6 col-md-8">
 						<label class="form-check mb-0">
 							<input class="form-check-input" type="checkbox" id="selectAllPerms">
 							<span class="form-check-label">{{ __('Select All') }}</span>
@@ -169,25 +169,31 @@ document.addEventListener('DOMContentLoaded', function ()
 					const row = document.createElement('div');
 					row.className = 'col-12';
 					row.innerHTML = `
-						<div class="row g-0 align-items-center py-3 border-top">
-							<div class="col-md-4 mb-2"><strong class="text-capitalize">${m.key}</strong></div>
-							<div class="col-md-8">
-								<div class="d-flex justify-content-start gap-5">
-									<label class="form-check mb-0">
-										<input class="form-check-input module-read" type="checkbox" name="modules[${i}][read]" value="1" ${m.readChecked ? 'checked' : ''} id="read_${i}">
-										<span class="form-check-label">{{ __('Read') }}</span>
-										${(m.readPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][readPerms][]" value="${p}">`).join('')}
-									</label>
-									<label class="form-check mb-0">
-										<input class="form-check-input module-write" type="checkbox" name="modules[${i}][write]" value="1" ${m.writeChecked ? 'checked' : ''} id="write_${i}">
-										<span class="form-check-label">{{ __('Write') }}</span>
-										${(m.writePerms||[]).map(p=>`<input type="hidden" name="modules[${i}][writePerms][]" value="${p}">`).join('')}
-									</label>
-									<label class="form-check mb-0">
-										<input class="form-check-input module-create" type="checkbox" name="modules[${i}][create]" value="1" ${m.createChecked ? 'checked' : ''} id="create_${i}">
-										<span class="form-check-label">{{ __('Create') }}</span>
-										${(m.createPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][createPerms][]" value="${p}">`).join('')}
-									</label>
+						<div class="row g-0 align-items-center py-3 border-bottom">
+							<div class="col-6 col-md-4 mb-2"><strong class="text-capitalize">${m.key}</strong></div>
+							<div class="col-6 col-md-8">
+								<div class="row g-0">
+									<div class="col-4">
+										<label class="form-check mb-0">
+											<input class="form-check-input module-read" type="checkbox" name="modules[${i}][read]" value="1" ${m.readChecked ? 'checked' : ''} id="read_${i}">
+											<span class="form-check-label">{{ __('Read') }}</span>
+											${(m.readPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][readPerms][]" value="${p}">`).join('')}
+										</label>
+									</div>
+									<div class="col-4">
+										<label class="form-check mb-0">
+											<input class="form-check-input module-write" type="checkbox" name="modules[${i}][write]" value="1" ${m.writeChecked ? 'checked' : ''} id="write_${i}">
+											<span class="form-check-label">{{ __('Write') }}</span>
+											${(m.writePerms||[]).map(p=>`<input type="hidden" name="modules[${i}][writePerms][]" value="${p}">`).join('')}
+										</label>
+									</div>
+									<div class="col-4">
+										<label class="form-check mb-0">
+											<input class="form-check-input module-create" type="checkbox" name="modules[${i}][create]" value="1" ${m.createChecked ? 'checked' : ''} id="create_${i}">
+											<span class="form-check-label">{{ __('Create') }}</span>
+											${(m.createPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][createPerms][]" value="${p}">`).join('')}
+										</label>
+									</div>
 								</div>
 							</div>
 						</div>
