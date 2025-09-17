@@ -20,14 +20,28 @@ $configData = Helper::appClasses();
 document.addEventListener('DOMContentLoaded', function ()
 {
     const tableId = '#usersByRoleTable';
-    let usersTable;
-    if ($.fn.DataTable.isDataTable(tableId))
-    {
-        usersTable = $(tableId).DataTable();
-    }
-    else
-    {
-        usersTable = $('.users-table').DataTable({
+    const buildRoleFilter = (api) => {
+        const container = document.querySelector('.user_role');
+        if (!container) return;
+        const select = document.createElement('select');
+        select.className = 'form-select text-capitalize';
+        select.innerHTML = `<option value=""> {{ __('Seleccionar rol') }} </option>`;
+        container.innerHTML = '';
+        container.appendChild(select);
+        const roles = new Set(api.column(1).data().toArray());
+        Array.from(roles).sort().forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r; opt.textContent = r; select.appendChild(opt);
+        });
+        select.addEventListener('change', function(){
+            const val = $.fn.dataTable.util.escapeRegex(this.value);
+            api.column(1).search(val ? '^' + val + '$' : '', true, false).draw();
+        });
+    };
+
+    const usersTable = $.fn.DataTable.isDataTable(tableId)
+        ? $(tableId).DataTable()
+        : $('.users-table').DataTable({
 		processing: true,
 		serverSide: false,
 		ajax: '{{ route('app-access-roles.users-data') }}',
@@ -50,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function ()
 				}
 			}
 		],
-        dom: '<"row mx-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+        dom: '<"row mx-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-end align-items-center gap-2"f>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
         language: {
             sProcessing: 'Procesando...',
             sLengthMenu: 'Mostrar _MENU_',
@@ -61,9 +75,9 @@ document.addEventListener('DOMContentLoaded', function ()
             sInfoFiltered: '(filtrado de _MAX_)',
             sSearch: 'Buscar',
             oPaginate: { sFirst: 'Primero', sLast: 'Último', sNext: 'Siguiente', sPrevious: 'Anterior' }
-        }
+        },
+        initComplete: function(){ buildRoleFilter(this.api()); }
     });
-    }
 });
 </script>
 @endsection
@@ -80,36 +94,18 @@ document.addEventListener('DOMContentLoaded', function ()
     </div>
     <script>
     document.addEventListener('DOMContentLoaded', function(){
-        // Build role filter select from table data once loaded
-        const buildRoleFilter = (table) => {
-            const column = table.column(1); // role column index in users table
-            const container = document.querySelector('.user_role');
-            if (!container) return;
-            const select = document.createElement('select');
-            select.className = 'form-select text-capitalize';
-            select.innerHTML = `<option value=""> {{ __('Seleccionar rol') }} </option>`;
-            container.innerHTML = '';
-            container.appendChild(select);
-            const roles = new Set(column.data().toArray());
-            Array.from(roles).sort().forEach(r => {
-                const opt = document.createElement('option');
-                opt.value = r; opt.textContent = r; select.appendChild(opt);
+        const addBtn = document.getElementById('addRoleBtn');
+        if (addBtn)
+        {
+            addBtn.addEventListener('click', function(){
+                const name = prompt('{{ __('Nombre del nuevo rol') }}');
+                if (!name) return;
+                fetch(`{{ route('app-access-roles.store') }}`, { method:'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type':'application/json' }, body: JSON.stringify({ name }) })
+                    .then(r=>r.ok ? r.json() : Promise.reject(r))
+                    .then(()=>location.reload())
+                    .catch(()=>alert('Error al crear el rol'));
             });
-            select.addEventListener('change', function(){
-                const val = $.fn.dataTable.util.escapeRegex(this.value);
-                column.search(val ? '^' + val + '$' : '', true, false).draw();
-            });
-        };
-        const t = $.fn.DataTable.isDataTable(tableId) ? $(tableId).DataTable() : usersTable;
-        if (t.state && t.state.loaded) { buildRoleFilter(t); }
-        else { t.on('init.dt', function(){ buildRoleFilter(t); }); }
-        // Add role button (minimal UX: prompt)
-        document.getElementById('addRoleBtn').addEventListener('click', function(){
-            const name = prompt('{{ __('Nombre del nuevo rol') }}');
-            if (!name) return;
-            fetch(`{{ route('app-access-roles.store') }}`, { method:'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type':'application/json' }, body: JSON.stringify({ name }) })
-                .then(r=>r.json()).then(()=>location.reload());
-        });
+        }
     });
     </script>
 </div>
