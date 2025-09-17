@@ -104,51 +104,16 @@ document.addEventListener('DOMContentLoaded', function ()
                 document.getElementById('modalRoleName').value = '';
                 const titleEl = document.querySelector('.role-title');
                 if (titleEl) { titleEl.textContent = '{{ __('Crear rol') }}'; }
+                // ocultar permisos en creación
                 const container = document.getElementById('permissionsContainer');
-                container.innerHTML = '<div class="text-muted">{{ __('Cargando...') }}</div>';
-                const resp = await fetch(`{{ route('app-access-roles.permissions-template') }}`);
-                const data = await resp.json();
                 container.innerHTML = '';
-                data.modules.forEach((m, i) => {
-                    const row = document.createElement('div');
-                    row.className = 'list-group-item px-3 py-2';
-                    row.innerHTML = `
-                        <div class="row g-0 align-items-center">
-                            <div class="col-6 col-md-4"><strong class="text-capitalize">${m.key}</strong></div>
-                            <div class="col-6 col-md-8">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col-4">
-                                        <label class="form-check mb-0">
-                                            <input class="form-check-input" type="checkbox" name="modules[${i}][read]" value="1" id="create_read_${i}">
-                                            <span class="form-check-label">{{ __('Leer') }}</span>
-                                            ${(m.readPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][readPerms][]" value="${p}">`).join('')}
-                                        </label>
-                                    </div>
-                                    <div class="col-4">
-                                        <label class="form-check mb-0">
-                                            <input class="form-check-input" type="checkbox" name="modules[${i}][write]" value="1" id="create_write_${i}">
-                                            <span class="form-check-label">{{ __('Escribir') }}</span>
-                                            ${(m.writePerms||[]).map(p=>`<input type="hidden" name="modules[${i}][writePerms][]" value="${p}">`).join('')}
-                                        </label>
-                                    </div>
-                                    <div class="col-4">
-                                        <label class="form-check mb-0">
-                                            <input class="form-check-input" type="checkbox" name="modules[${i}][create]" value="1" id="create_create_${i}">
-                                            <span class="form-check-label">{{ __('Crear') }}</span>
-                                            ${(m.createPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][createPerms][]" value="${p}">`).join('')}
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`;
-                    container.appendChild(row);
-                });
-                // Override submit to create
+                container.style.display = 'none';
+                // Override submit to create (solo nombre)
                 const form = document.getElementById('roleEditForm');
                 form.onsubmit = async function(e){
                     e.preventDefault();
                     const fd = new FormData(form);
-                    const payload = Object.fromEntries(fd.entries());
+                    const payload = { name: fd.get('name') };
                     const resp = await fetch(`{{ route('app-access-roles.store') }}`,{ method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','Content-Type':'application/json'}, body: JSON.stringify(payload)});
                     if (resp.ok){ modal.hide(); location.reload(); } else { alert('Error'); }
                 };
