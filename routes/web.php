@@ -13,6 +13,7 @@ Route::middleware(['web', 'auth'])->group(function ()
 	Route::post('/app/access-roles', [RoleController::class, 'store'])->name('app-access-roles.store');
 	Route::get('/app/access-roles/users-data', [RoleController::class, 'usersData'])->name('app-access-roles.users-data');
 	Route::get('/app/access-roles/{role}/permissions', [RoleController::class, 'permissions'])->name('app-access-roles.permissions');
+	Route::get('/app/access-roles/permissions-template', [RoleController::class, 'permissionsTemplate'])->name('app-access-roles.permissions-template');
 	Route::post('/app/access-roles/{role}', [RoleController::class, 'update'])->name('app-access-roles.update');
 	Route::get('/app/access-permission', [PermissionController::class, 'index'])->name('app-access-permission');
 	Route::get('/app/access-permission/data', [PermissionController::class, 'data'])->name('app-access-permission.data');

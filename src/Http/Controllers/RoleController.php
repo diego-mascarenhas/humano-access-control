@@ -218,6 +218,33 @@ class RoleController
 
 		return response()->json(['success' => true, 'id' => $role->id]);
 	}
+
+	public function permissionsTemplate(): JsonResponse
+	{
+		// Reuse permissions() grouping but without a specific role (empty assigned)
+		$all = Permission::query()->orderBy('name')->pluck('name');
+		$assigned = collect();
+		$modules = [];
+		foreach ($all as $perm)
+		{
+			$parts = explode('.', $perm);
+			if (count($parts) < 2) continue;
+			$module = $parts[0]; $action = $parts[1];
+			$modules[$module] = $modules[$module] ?? ['key'=>$module,'readPerms'=>[],'writePerms'=>[],'createPerms'=>[]];
+			if (in_array($action, ['show','index','list','view'])) $modules[$module]['readPerms'][] = $perm;
+			if (in_array($action, ['show','edit','update','store'])) $modules[$module]['writePerms'][] = $perm;
+			if ($action === 'create') $modules[$module]['createPerms'][] = $perm;
+		}
+		$modules = array_values(array_map(function (array $m) use ($assigned)
+		{
+			$m['readChecked'] = false;
+			$m['writeChecked'] = false;
+			$m['createChecked'] = false;
+			return $m;
+		}, $modules));
+
+		return response()->json(['modules' => $modules]);
+	}
 }
 
 
