@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function ()
             <h4 class="mb-1 text-capitalize">{{ $role['name'] }}</h4>
             <small class="text-muted">{{ __('Permissions') }}: {{ $role['permissions_count'] }}</small>
           </div>
-          <a href="javascript:void(0);" class="text-muted"><i class="ti ti-copy ti-md"></i></a>
+          <a href="javascript:;" class="text-body role-edit-modal"><i class="ti ti-edit ti-md"></i></a>
         </div>
       </div>
     </div>
