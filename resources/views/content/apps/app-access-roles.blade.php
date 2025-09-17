@@ -102,6 +102,8 @@ document.addEventListener('DOMContentLoaded', function ()
                 const modal = new bootstrap.Modal(modalEl);
                 // reset form for create
                 document.getElementById('modalRoleName').value = '';
+                const titleEl = document.querySelector('.role-title');
+                if (titleEl) { titleEl.textContent = '{{ __('Crear rol') }}'; }
                 const container = document.getElementById('permissionsContainer');
                 container.innerHTML = '<div class="text-muted">{{ __('Cargando...') }}</div>';
                 const resp = await fetch(`{{ route('app-access-roles.permissions-template') }}`);
