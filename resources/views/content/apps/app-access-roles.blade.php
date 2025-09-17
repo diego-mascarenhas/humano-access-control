@@ -61,10 +61,47 @@ document.addEventListener('DOMContentLoaded', function ()
 
 @section('content')
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
-	<div class="d-flex flex-column justify-content-center">
-		<h4 class="mb-1 mt-3"><span class="text-muted fw-light">{{ __('Roles & Permissions') }}/</span> {{ __('Roles') }}</h4>
-		<p class="text-muted">{{ __('Gestiona los roles y sus asignaciones') }}</p>
-	</div>
+    <div class="d-flex flex-column justify-content-center">
+        <h4 class="mb-1 mt-3"><span class="text-muted fw-light">{{ __('Roles & Permissions') }}/</span> {{ __('Roles') }}</h4>
+        <p class="text-muted">{{ __('Gestiona los roles y sus asignaciones') }}</p>
+    </div>
+    <div class="mt-3 mt-md-0 d-flex align-items-center gap-2">
+        <div class="user_role w-px-220"></div>
+        <button id="addRoleBtn" class="btn btn-primary">+ {{ __('Añadir rol') }}</button>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        // Build role filter select from table data once loaded
+        const buildRoleFilter = (table) => {
+            const column = table.column(1); // role column index in users table
+            const container = document.querySelector('.user_role');
+            if (!container) return;
+            const select = document.createElement('select');
+            select.className = 'form-select text-capitalize';
+            select.innerHTML = `<option value=""> {{ __('Seleccionar rol') }} </option>`;
+            container.innerHTML = '';
+            container.appendChild(select);
+            const roles = new Set(column.data().toArray());
+            Array.from(roles).sort().forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r; opt.textContent = r; select.appendChild(opt);
+            });
+            select.addEventListener('change', function(){
+                const val = $.fn.dataTable.util.escapeRegex(this.value);
+                column.search(val ? '^' + val + '$' : '', true, false).draw();
+            });
+        };
+        const t = $('#usersByRoleTable').DataTable();
+        t.on('init.dt', function(){ buildRoleFilter(t); });
+        // Add role button (minimal UX: prompt)
+        document.getElementById('addRoleBtn').addEventListener('click', function(){
+            const name = prompt('{{ __('Nombre del nuevo rol') }}');
+            if (!name) return;
+            fetch(`{{ route('app-access-roles.store') }}`, { method:'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type':'application/json' }, body: JSON.stringify({ name }) })
+                .then(r=>r.json()).then(()=>location.reload());
+        });
+    });
+    </script>
 </div>
 
 <!-- Role cards -->

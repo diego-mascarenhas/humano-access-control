@@ -207,6 +207,17 @@ class RoleController
 
 		return response()->json(['success' => true]);
 	}
+
+	public function store(Request $request): JsonResponse
+	{
+		$data = $request->validate([
+			'name' => ['required', 'string', 'max:255', 'unique:roles,name']
+		]);
+
+		$role = Role::create(['name' => $data['name']]);
+
+		return response()->json(['success' => true, 'id' => $role->id]);
+	}
 }
 
 
