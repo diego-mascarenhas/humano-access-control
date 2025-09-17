@@ -1,84 +1,25 @@
-# Roles & permissions management
+# Humano Access Control
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/diego-mascarenhas/humano-access-control.svg?style=flat-square)](https://packagist.org/packages/diego-mascarenhas/humano-access-control)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/diego-mascarenhas/humano-access-control/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/diego-mascarenhas/humano-access-control/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/diego-mascarenhas/humano-access-control/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/diego-mascarenhas/humano-access-control/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/diego-mascarenhas/humano-access-control.svg?style=flat-square)](https://packagist.org/packages/diego-mascarenhas/humano-access-control)
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/humano-access-control.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/humano-access-control)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+Roles & permissions management for Laravel (Vuexy UI).
 
 ## Installation
 
-You can install the package via composer:
-
 ```bash
-composer require diego-mascarenhas/humano-access-control
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="humano-access-control-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="humano-access-control-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="humano-access-control-views"
+composer require idoneo/humano-access-control
 ```
 
 ## Usage
 
-```php
-$humanoAccessControl = new Idoneo\HumanoAccessControl();
-echo $humanoAccessControl->echoPhrase('Hello, Idoneo!');
-```
+- Routes:
+  - `/app/access-roles`
+  - `/app/access-permission`
 
-## Testing
+## Support
 
-```bash
-composer test
-```
+If you find this package useful, you can support the maintainer on GitHub.
 
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
-## Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
-## Credits
-
-- [Diego Adrián Mascarenhas Goytía](https://github.com/diego-mascarenhas)
-- [All Contributors](../../contributors)
+- Maintainer: [diego-mascarenhas](https://github.com/diego-mascarenhas)
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+AGPL-3.0
