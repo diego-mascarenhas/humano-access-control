@@ -12,9 +12,48 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('vendor-script')
+<script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
 @endsection
 
 @section('page-script')
+<script>
+document.addEventListener('DOMContentLoaded', function ()
+{
+	$('.users-table').DataTable({
+		processing: true,
+		serverSide: false,
+		ajax: '{{ route('app-access-roles.users-data') }}',
+        columns: [
+            { data: null, title: '{{ __('Usuario') }}', render: function (row)
+				{
+					return `<div class="d-flex align-items-center">
+						<div class="d-flex flex-column">
+							<span class="fw-medium">${row.name}</span>
+							<small class="text-muted">${row.email}</small>
+						</div>
+					</div>`;
+				}
+			},
+            { data: 'role', title: '{{ __('Rol') }}' },
+            { data: 'status', title: '{{ __('Estado') }}', className: 'text-center', render: function (val)
+				{
+                    const map = { 'Active': 'bg-label-success', 'Pending': 'bg-label-warning', 'Inactive': 'bg-label-secondary' };
+					return `<span class="badge ${map[val] || 'bg-label-secondary'}">${val}</span>`;
+				}
+			}
+		],
+		drawCallback: function ()
+		{
+			$("#usersByRoleTable tbody tr").css({
+				"user-select": "none",
+				"-webkit-user-select": "none",
+				"-moz-user-select": "none",
+				"-ms-user-select": "none"
+			});
+		}
+	});
+});
+</script>
 @endsection
 
 @section('content')
@@ -27,112 +66,30 @@ $configData = Helper::appClasses();
 
 <!-- Role cards -->
 <div class="row g-4">
+  @foreach($roles as $role)
   <div class="col-xl-4 col-lg-6 col-md-6">
     <div class="card">
       <div class="card-body">
-        <div class="d-flex justify-content-between">
-          <h6 class="fw-normal mb-2">Total 4 users</h6>
-          <ul class="list-unstyled d-flex align-items-center avatar-group mb-0">
-            <li class="avatar avatar-sm pull-up">
-              <img class="rounded-circle" src="{{ asset('assets/img/avatars/5.png') }}" alt="Avatar">
-            </li>
-            <li class="avatar avatar-sm pull-up">
-              <img class="rounded-circle" src="{{ asset('assets/img/avatars/12.png') }}" alt="Avatar">
-            </li>
-            <li class="avatar avatar-sm pull-up">
-              <img class="rounded-circle" src="{{ asset('assets/img/avatars/6.png') }}" alt="Avatar">
-            </li>
-            <li class="avatar avatar-sm pull-up">
-              <img class="rounded-circle" src="{{ asset('assets/img/avatars/3.png') }}" alt="Avatar">
-            </li>
-          </ul>
+					<div class="d-flex justify-content-between">
+          <h6 class="fw-normal mb-2">{{ __('Total') }} {{ $role['users_count'] }} {{ __('usuarios') }}</h6>
         </div>
         <div class="d-flex justify-content-between align-items-end mt-1">
           <div class="role-heading">
-            <h4 class="mb-1">Administrator</h4>
-            <a href="javascript:;" class="role-edit-modal"><span>Edit Role</span></a>
+            <h4 class="mb-1 text-capitalize">{{ $role['name'] }}</h4>
+            <small class="text-muted">{{ __('Permisos') }}: {{ $role['permissions_count'] }}</small>
           </div>
-          <a href="javascript:void(0);" class="text-muted"><i class="ti ti-copy ti-md"></i></a>
+          <a href="javascript:;" class="text-body role-edit-modal" data-role-id="{{ $role['id'] }}" data-role-name="{{ $role['name'] }}"><i class="ti ti-edit ti-md"></i></a>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="col-xl-4 col-lg-6 col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex justify-content-between">
-          <h6 class="fw-normal mb-2">Total 7 users</h6>
-          <ul class="list-unstyled d-flex align-items-center avatar-group mb-0">
-            <li class="avatar avatar-sm pull-up">
-              <img class="rounded-circle" src="{{ asset('assets/img/avatars/4.png') }}" alt="Avatar">
-            </li>
-            <li class="avatar avatar-sm pull-up">
-              <img class="rounded-circle" src="{{ asset('assets/img/avatars/1.png') }}" alt="Avatar">
-            </li>
-            <li class="avatar avatar-sm pull-up">
-              <img class="rounded-circle" src="{{ asset('assets/img/avatars/2.png') }}" alt="Avatar">
-            </li>
-          </ul>
-        </div>
-        <div class="d-flex justify-content-between align-items-end mt-1">
-          <div class="role-heading">
-            <h4 class="mb-1">Manager</h4>
-            <a href="javascript:;" class="role-edit-modal"><span>Edit Role</span></a>
-          </div>
-          <a href="javascript:void(0);" class="text-muted"><i class="ti ti-copy ti-md"></i></a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-xl-4 col-lg-6 col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex justify-content-between">
-          <h6 class="fw-normal mb-2">Total 5 users</h6>
-          <ul class="list-unstyled d-flex align-items-center avatar-group mb-0">
-            <li class="avatar avatar-sm pull-up">
-              <img class="rounded-circle" src="{{ asset('assets/img/avatars/6.png') }}" alt="Avatar">
-            </li>
-            <li class="avatar avatar-sm pull-up">
-              <img class="rounded-circle" src="{{ asset('assets/img/avatars/9.png') }}" alt="Avatar">
-            </li>
-          </ul>
-        </div>
-        <div class="d-flex justify-content-between align-items-end mt-1">
-          <div class="role-heading">
-            <h4 class="mb-1">Users</h4>
-            <a href="javascript:;" class="role-edit-modal"><span>Edit Role</span></a>
-          </div>
-          <a href="javascript:void(0);" class="text-muted"><i class="ti ti-copy ti-md"></i></a>
-        </div>
-      </div>
-    </div>
-  </div>
+  @endforeach
 
   <div class="col-12">
-    <div class="card">
-      <h5 class="card-header">{{ __('Users by role') }}</h5>
-      <div class="table-responsive">
-        <table class="table border-top dataTable">
-          <thead>
-            <tr>
-              <th>{{ __('User') }}</th>
-              <th>{{ __('Role') }}</th>
-              <th class="text-center">{{ __('Status') }}</th>
-              <th class="text-center">{{ __('Actions') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>john@example.com</td>
-              <td>Administrator</td>
-              <td class="text-center"><span class="badge bg-label-success">Active</span></td>
-              <td class="text-center"><a href="javascript:;" class="text-body"><i class="ti ti-edit ti-sm me-2"></i></a><a href="javascript:;" class="text-danger"><i class="ti ti-trash ti-sm"></i></a></td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="card mt-4">
+      <h5 class="card-header">{{ __('Usuarios por rol') }}</h5>
+      <div class="card-datatable table-responsive">
+        <table id="usersByRoleTable" class="table users-table"></table>
       </div>
     </div>
   </div>
@@ -140,4 +97,140 @@ $configData = Helper::appClasses();
 <!--/ Role cards -->
 @endsection
 
+@push('modals')
+<div class="modal fade" id="roleEditModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form id="roleEditForm" method="POST">
+				@csrf
+				<div class="modal-body">
+					<div class="text-center mb-4">
+					<h3 class="role-title mb-2">{{ __('Editar rol') }}</h3>
+					<p class="text-muted">{{ __('Configurar permisos del rol') }}</p>
+					</div>
+					<div class="col-12 mb-4 fv-plugins-icon-container">
+						<label class="form-label" for="modalRoleName">{{ __('Nombre del rol') }}</label>
+						<input type="text" id="modalRoleName" name="name" class="form-control" placeholder="{{ __('Ingresá un nombre de rol') }}" tabindex="-1" required>
+						<div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+					</div>
+					<!-- Permissions table will be injected below -->
+					<div id="permissionsContainer" class="row g-3"></div>
+				</div>
+				<div class="col-12 text-center mt-4 mb-3">
+					<button type="submit" class="btn btn-primary me-sm-3 me-1 waves-effect waves-light">{{ __('Guardar') }}</button>
+					<button type="button" class="btn btn-label-secondary waves-effect" data-bs-dismiss="modal" aria-label="Close">{{ __('Cancelar') }}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+@endpush
 
+@push('scripts')
+<script>
+(function(){
+	const modalEl = document.getElementById('roleEditModal');
+	const modal = new bootstrap.Modal(modalEl);
+	const form = document.getElementById('roleEditForm');
+	const nameInput = document.getElementById('modalRoleName');
+	const container = document.getElementById('permissionsContainer');
+	let currentRoleId = null;
+
+	$(document).on('click', '.role-edit-modal', function ()
+	{
+		currentRoleId = this.getAttribute('data-role-id');
+		const roleName = this.getAttribute('data-role-name') || '';
+		nameInput.value = roleName;
+		container.innerHTML = '<div class="text-muted">{{ __('Loading...') }}</div>';
+		fetch(`{{ url('app/access-roles') }}/${currentRoleId}/permissions`)
+			.then(r => r.json())
+			.then(data => {
+				nameInput.value = data.role.name;
+				container.innerHTML = '';
+
+				// Build table per original style
+				const wrapper = document.createElement('div');
+				wrapper.className = 'col-12';
+					const title = document.createElement('h5');
+					title.textContent = `{{ __('Permisos del rol') }}`;
+				wrapper.appendChild(title);
+				const tableWrap = document.createElement('div');
+				tableWrap.className = 'table-responsive';
+				const table = document.createElement('table');
+				table.className = 'table table-flush-spacing';
+				const tbody = document.createElement('tbody');
+
+				// Header row: Administrator Access + Select All
+				const trHeader = document.createElement('tr');
+				trHeader.innerHTML = `
+					<td class="text-nowrap fw-medium">
+						{{ __('Acceso de administrador') }} <i class="ti ti-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="{{ __('Permite acceso completo al sistema') }}" title="{{ __('Permite acceso completo al sistema') }}"></i>
+					</td>
+					<td>
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" id="selectAll">
+							<label class="form-check-label" for="selectAll">{{ __('Seleccionar todo') }}</label>
+						</div>
+					</td>
+				`;
+				tbody.appendChild(trHeader);
+
+				data.modules.forEach((m, i) => {
+					const tr = document.createElement('tr');
+					tr.innerHTML = `
+						<td class="text-nowrap fw-medium"><span class="text-capitalize">${m.key}</span></td>
+						<td>
+							<div class="d-flex">
+								<div class="form-check me-3 me-lg-5">
+									<input class="form-check-input module-read" type="checkbox" name="modules[${i}][read]" value="1" ${m.readChecked ? 'checked' : ''} id="read_${i}">
+									<label class="form-check-label" for="read_${i}">{{ __('Leer') }}</label>
+									${(m.readPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][readPerms][]" value="${p}">`).join('')}
+								</div>
+								<div class="form-check me-3 me-lg-5">
+									<input class="form-check-input module-write" type="checkbox" name="modules[${i}][write]" value="1" ${m.writeChecked ? 'checked' : ''} id="write_${i}">
+									<label class="form-check-label" for="write_${i}">{{ __('Escribir') }}</label>
+									${(m.writePerms||[]).map(p=>`<input type="hidden" name="modules[${i}][writePerms][]" value="${p}">`).join('')}
+								</div>
+								<div class="form-check">
+									<input class="form-check-input module-create" type="checkbox" name="modules[${i}][create]" value="1" ${m.createChecked ? 'checked' : ''} id="create_${i}">
+									<label class="form-check-label" for="create_${i}">{{ __('Crear') }}</label>
+									${(m.createPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][createPerms][]" value="${p}">`).join('')}
+								</div>
+							</div>
+						</td>
+					`;
+					tbody.appendChild(tr);
+				});
+
+				table.appendChild(tbody);
+				tableWrap.appendChild(table);
+				wrapper.appendChild(tableWrap);
+				container.appendChild(wrapper);
+
+				// Select All toggles
+				container.querySelector('#selectAll')?.addEventListener('change', function(){
+					const checked = this.checked;
+					container.querySelectorAll('input.form-check-input').forEach(el => {
+						if (el.id !== 'selectAll') el.checked = checked;
+					});
+				});
+				modal.show();
+			});
+	});
+
+	form.addEventListener('submit', function (e)
+	{
+		e.preventDefault();
+		const formData = new FormData(form);
+		fetch(`{{ url('app/access-roles') }}/${currentRoleId}`, {
+			method: 'POST',
+			headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+			body: formData
+		}).then(r => r.json()).then(() => { modal.hide(); location.reload(); });
+	});
+})();
+</script>
+@endpush
