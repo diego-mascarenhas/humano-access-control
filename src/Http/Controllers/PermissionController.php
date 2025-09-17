@@ -22,6 +22,7 @@ class PermissionController
 			{
 				return view('humano-access-control::components.permissions.actions', compact('permission'))->render();
 			})
+			->rawColumns(['actions'])
 			->toJson();
 	}
 }
