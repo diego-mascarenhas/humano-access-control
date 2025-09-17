@@ -111,9 +111,10 @@ document.addEventListener('DOMContentLoaded', function ()
 						<h3 class="role-title mb-2">{{ __('Edit Role') }}</h3>
 						<p class="text-muted">{{ __('Set role permissions') }}</p>
 					</div>
-					<div class="mb-3">
-						<label class="form-label">{{ __('Role Name') }}</label>
-						<input type="text" class="form-control" name="name" id="roleName" required>
+					<div class="col-12 mb-4 fv-plugins-icon-container">
+						<label class="form-label" for="modalRoleName">{{ __('Role Name') }}</label>
+						<input type="text" id="modalRoleName" name="name" class="form-control" placeholder="{{ __('Enter a role name') }}" tabindex="-1" required>
+						<div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
 					</div>
 					<h6 class="mb-3 fw-bold">{{ __('Role Permissions') }}</h6>
 					<div id="permissionsContainer" class="row g-3"></div>
@@ -134,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function ()
 	const modalEl = document.getElementById('roleEditModal');
 	const modal = new bootstrap.Modal(modalEl);
 	const form = document.getElementById('roleEditForm');
-	const nameInput = document.getElementById('roleName');
+	const nameInput = document.getElementById('modalRoleName');
 	const container = document.getElementById('permissionsContainer');
 	let currentRoleId = null;
 
