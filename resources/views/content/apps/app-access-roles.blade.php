@@ -148,31 +148,37 @@ document.addEventListener('DOMContentLoaded', function ()
 				nameInput.value = data.role.name;
 				container.innerHTML = '';
 
+				// Use list-group layout (Bootstrap/Vuexy) to mirror original style
+				const list = document.createElement('div');
+				list.className = 'list-group list-group-flush w-100';
+
 				// Header row: Administrator Access + Select All
 				const headerRow = document.createElement('div');
-				headerRow.className = 'row g-0 align-items-center py-2 border-bottom';
+				headerRow.className = 'list-group-item px-0 py-2';
 				headerRow.innerHTML = `
-					<div class="col-6 col-md-4 mb-2">
-						<strong>{{ __('Administrator Access') }}</strong>
-						<i class="ti ti-info-circle ms-1 text-muted"></i>
-					</div>
-					<div class="col-6 col-md-8">
-						<label class="form-check mb-0">
-							<input class="form-check-input" type="checkbox" id="selectAllPerms">
-							<span class="form-check-label">{{ __('Select All') }}</span>
-						</label>
+					<div class="row g-0 align-items-center">
+						<div class="col-6 col-md-4 mb-2">
+							<strong>{{ __('Administrator Access') }}</strong>
+							<i class="ti ti-info-circle ms-1 text-muted"></i>
+						</div>
+						<div class="col-6 col-md-8 d-flex align-items-center">
+							<label class="form-check mb-0">
+								<input class="form-check-input" type="checkbox" id="selectAllPerms">
+								<span class="form-check-label">{{ __('Select All') }}</span>
+							</label>
+						</div>
 					</div>
 				`;
-				container.appendChild(headerRow);
+				list.appendChild(headerRow);
 
 				data.modules.forEach((m, i) => {
 					const row = document.createElement('div');
-					row.className = 'col-12';
+					row.className = 'list-group-item px-0 py-2';
 					row.innerHTML = `
-						<div class="row g-0 align-items-center py-2 border-bottom">
-							<div class="col-6 col-md-4 mb-2"><strong class="text-capitalize">${m.key}</strong></div>
+						<div class="row g-0 align-items-center">
+							<div class="col-6 col-md-4"><strong class="text-capitalize">${m.key}</strong></div>
 							<div class="col-6 col-md-8">
-								<div class="row g-0">
+								<div class="row g-0 align-items-center">
 									<div class="col-4">
 										<label class="form-check mb-0">
 											<input class="form-check-input module-read" type="checkbox" name="modules[${i}][read]" value="1" ${m.readChecked ? 'checked' : ''} id="read_${i}">
@@ -198,8 +204,10 @@ document.addEventListener('DOMContentLoaded', function ()
 							</div>
 						</div>
 					`;
-					container.appendChild(row);
+					list.appendChild(row);
 				});
+
+				container.appendChild(list);
 
 				// Select All toggles
 				container.querySelector('#selectAllPerms')?.addEventListener('change', function(){
