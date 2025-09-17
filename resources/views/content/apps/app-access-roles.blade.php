@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function ()
 					<!-- Permissions table will be injected below -->
 					<div id="permissionsContainer" class="row g-3"></div>
 				</div>
-				<div class="col-12 text-center mt-4">
+				<div class="col-12 text-center mt-4 mb-3">
 					<button type="submit" class="btn btn-primary me-sm-3 me-1 waves-effect waves-light">{{ __('Guardar') }}</button>
 					<button type="button" class="btn btn-label-secondary waves-effect" data-bs-dismiss="modal" aria-label="Close">{{ __('Cancelar') }}</button>
 				</div>
