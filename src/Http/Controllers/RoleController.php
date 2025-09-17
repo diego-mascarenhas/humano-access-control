@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\User;
+use Yajra\DataTables\DataTables;
 
 class RoleController
 {
@@ -150,6 +151,25 @@ class RoleController
 		]);
 	}
 
+	/**
+	 * Yajra DataTables: Roles list (name, users_count, permissions_count)
+	 */
+	public function listData(Request $request)
+	{
+		$query = Role::query()
+			->select(['id', 'name'])
+			->withCount('permissions')
+			->selectSub(
+				DB::table('model_has_roles')
+					->selectRaw('count(*)')
+					->whereColumn('model_has_roles.role_id', 'roles.id'),
+				'users_count'
+			)
+			->orderBy('name');
+
+		return DataTables::of($query)->toJson();
+	}
+
 	public function update(Request $request, Role $role): JsonResponse
 	{
 		$data = $request->validate([
@@ -186,6 +206,44 @@ class RoleController
 		$role->syncPermissions(array_values(array_unique($permissionsToSync)));
 
 		return response()->json(['success' => true]);
+	}
+
+	public function store(Request $request): JsonResponse
+	{
+		$data = $request->validate([
+			'name' => ['required', 'string', 'max:255', 'unique:roles,name']
+		]);
+
+		$role = Role::create(['name' => $data['name']]);
+
+		return response()->json(['success' => true, 'id' => $role->id]);
+	}
+
+	public function permissionsTemplate(): JsonResponse
+	{
+		// Reuse permissions() grouping but without a specific role (empty assigned)
+		$all = Permission::query()->orderBy('name')->pluck('name');
+		$assigned = collect();
+		$modules = [];
+		foreach ($all as $perm)
+		{
+			$parts = explode('.', $perm);
+			if (count($parts) < 2) continue;
+			$module = $parts[0]; $action = $parts[1];
+			$modules[$module] = $modules[$module] ?? ['key'=>$module,'readPerms'=>[],'writePerms'=>[],'createPerms'=>[]];
+			if (in_array($action, ['show','index','list','view'])) $modules[$module]['readPerms'][] = $perm;
+			if (in_array($action, ['show','edit','update','store'])) $modules[$module]['writePerms'][] = $perm;
+			if ($action === 'create') $modules[$module]['createPerms'][] = $perm;
+		}
+		$modules = array_values(array_map(function (array $m) use ($assigned)
+		{
+			$m['readChecked'] = false;
+			$m['writeChecked'] = false;
+			$m['createChecked'] = false;
+			return $m;
+		}, $modules));
+
+		return response()->json(['modules' => $modules]);
 	}
 }
 

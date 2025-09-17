@@ -8,53 +8,52 @@
 @endsection
 
 @section('vendor-script')
+<script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
 @endsection
 
 @section('page-script')
+<script>
+document.addEventListener('DOMContentLoaded', function ()
+{
+	$('.permissions-table').DataTable({
+		processing: true,
+		serverSide: true,
+		ajax: '{{ route('app-access-permission.data') }}',
+		columns: [
+			{ data: 'name', title: '{{ __('Nombre') }}', render: function (val)
+				{ return `<span class="fw-medium">${val}</span>`; }
+			},
+			{ data: 'assigned_to', title: '{{ __('Asignado a') }}', className: 'text-center', orderable: false, searchable: false }
+		],
+		dom: '<"row mx-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+		language: {
+			sProcessing: 'Procesando...',
+			sLengthMenu: 'Mostrar _MENU_',
+			sZeroRecords: 'No se encontraron resultados',
+			sEmptyTable: 'Sin datos disponibles',
+			sInfo: 'Mostrando _START_ a _END_ de _TOTAL_',
+			sInfoEmpty: 'Mostrando 0 a 0 de 0',
+			sInfoFiltered: '(filtrado de _MAX_)',
+			sSearch: 'Buscar',
+			oPaginate: { sFirst: 'Primero', sLast: 'Último', sNext: 'Siguiente', sPrevious: 'Anterior' }
+		}
+	});
+});
+</script>
 @endsection
 
 @section('content')
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
 	<div class="d-flex flex-column justify-content-center">
 		<h4 class="mb-1 mt-3"><span class="text-muted fw-light">{{ __('Roles & Permissions') }}/</span> {{ __('Permissions') }}</h4>
-		<p class="text-muted">{{ __('Manage application permissions and assignments') }}</p>
+		<p class="text-muted">{{ __('Gestiona los permisos de la aplicación y sus asignaciones') }}</p>
 	</div>
 </div>
 
 <div class="card">
-	<h5 class="card-header">{{ __('Permissions') }}</h5>
-	<div class="table-responsive">
-		<table class="table table-striped dataTable">
-			<thead>
-				<tr>
-					<th>{{ __('Name') }}</th>
-					<th class="text-center">{{ __('Assigned To') }}</th>
-					<th class="text-center">{{ __('Created Date') }}</th>
-					<th class="text-center">{{ __('Actions') }}</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td><span class="fw-medium">view users</span></td>
-					<td class="text-center"><span class="badge bg-label-primary">{{ __('Admin') }}</span></td>
-					<td class="text-center">2024-01-15</td>
-					<td class="text-center">
-						<a href="javascript:;" class="text-body"><i class="ti ti-edit ti-sm me-2"></i></a>
-						<a href="javascript:;" class="text-danger"><i class="ti ti-trash ti-sm"></i></a>
-					</td>
-				</tr>
-				<tr>
-					<td><span class="fw-medium">edit projects</span></td>
-					<td class="text-center"><span class="badge bg-label-info">{{ __('Editor') }}</span></td>
-					<td class="text-center">2024-03-02</td>
-					<td class="text-center">
-						<a href="javascript:;" class="text-body"><i class="ti ti-edit ti-sm me-2"></i></a>
-						<a href="javascript:;" class="text-danger"><i class="ti ti-trash ti-sm"></i></a>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+    <div class="card-datatable table-responsive">
+        <table class="table permissions-table w-100"></table>
+    </div>
 </div>
 @endsection
 

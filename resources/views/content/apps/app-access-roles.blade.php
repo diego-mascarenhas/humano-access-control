@@ -19,7 +19,29 @@ $configData = Helper::appClasses();
 <script>
 document.addEventListener('DOMContentLoaded', function ()
 {
-	$('.users-table').DataTable({
+    const tableId = '#usersByRoleTable';
+    const buildRoleFilter = (api) => {
+        const container = document.querySelector('.user_role');
+        if (!container) return;
+        const select = document.createElement('select');
+        select.className = 'form-select text-capitalize';
+        select.innerHTML = `<option value=""> {{ __('Seleccionar rol') }} </option>`;
+        container.innerHTML = '';
+        container.appendChild(select);
+        const roles = new Set(api.column(1).data().toArray());
+        Array.from(roles).sort().forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r; opt.textContent = r; select.appendChild(opt);
+        });
+        select.addEventListener('change', function(){
+            const val = $.fn.dataTable.util.escapeRegex(this.value);
+            api.column(1).search(val ? '^' + val + '$' : '', true, false).draw();
+        });
+    };
+
+    const usersTable = $.fn.DataTable.isDataTable(tableId)
+        ? $(tableId).DataTable()
+        : $('.users-table').DataTable({
 		processing: true,
 		serverSide: false,
 		ajax: '{{ route('app-access-roles.users-data') }}',
@@ -42,26 +64,64 @@ document.addEventListener('DOMContentLoaded', function ()
 				}
 			}
 		],
-		drawCallback: function ()
-		{
-			$("#usersByRoleTable tbody tr").css({
-				"user-select": "none",
-				"-webkit-user-select": "none",
-				"-moz-user-select": "none",
-				"-ms-user-select": "none"
-			});
-		}
-	});
+        dom: '<"row mx-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-end align-items-center gap-2"f>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+        language: {
+            sProcessing: 'Procesando...',
+            sLengthMenu: 'Mostrar _MENU_',
+            sZeroRecords: 'No se encontraron resultados',
+            sEmptyTable: 'Sin datos disponibles',
+            sInfo: 'Mostrando _START_ a _END_ de _TOTAL_',
+            sInfoEmpty: 'Mostrando 0 a 0 de 0',
+            sInfoFiltered: '(filtrado de _MAX_)',
+            sSearch: 'Buscar',
+            oPaginate: { sFirst: 'Primero', sLast: 'Último', sNext: 'Siguiente', sPrevious: 'Anterior' }
+        },
+        initComplete: function(){ buildRoleFilter(this.api()); }
+    });
 });
 </script>
 @endsection
 
 @section('content')
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
-	<div class="d-flex flex-column justify-content-center">
-		<h4 class="mb-1 mt-3"><span class="text-muted fw-light">{{ __('Roles & Permissions') }}/</span> {{ __('Roles') }}</h4>
-		<p class="text-muted">{{ __('Manage roles and their assignments') }}</p>
-	</div>
+    <div class="d-flex flex-column justify-content-center">
+        <h4 class="mb-1 mt-3"><span class="text-muted fw-light">{{ __('Roles & Permissions') }}/</span> {{ __('Roles') }}</h4>
+        <p class="text-muted">{{ __('Gestiona los roles y sus asignaciones') }}</p>
+    </div>
+    <div class="mt-3 mt-md-0 d-flex align-items-center gap-2">
+        <div class="user_role w-px-220"></div>
+        <button id="addRoleBtn" class="btn btn-primary">+ {{ __('Añadir rol') }}</button>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const addBtn = document.getElementById('addRoleBtn');
+        if (addBtn)
+        {
+            addBtn.addEventListener('click', async function(){
+                const modalEl = document.getElementById('roleEditModal');
+                const modal = new bootstrap.Modal(modalEl);
+                // reset form for create
+                document.getElementById('modalRoleName').value = '';
+                const titleEl = document.querySelector('.role-title');
+                if (titleEl) { titleEl.textContent = '{{ __('Crear rol') }}'; }
+                // ocultar permisos en creación
+                const container = document.getElementById('permissionsContainer');
+                container.innerHTML = '';
+                container.style.display = 'none';
+                // Override submit to create (solo nombre)
+                const form = document.getElementById('roleEditForm');
+                form.onsubmit = async function(e){
+                    e.preventDefault();
+                    const fd = new FormData(form);
+                    const payload = { name: fd.get('name') };
+                    const resp = await fetch(`{{ route('app-access-roles.store') }}`,{ method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','Content-Type':'application/json'}, body: JSON.stringify(payload)});
+                    if (resp.ok){ modal.hide(); location.reload(); } else { alert('Error'); }
+                };
+                modal.show();
+            });
+        }
+    });
+    </script>
 </div>
 
 <!-- Role cards -->
@@ -87,9 +147,8 @@ document.addEventListener('DOMContentLoaded', function ()
 
   <div class="col-12">
     <div class="card mt-4">
-      <h5 class="card-header">{{ __('Usuarios por rol') }}</h5>
       <div class="card-datatable table-responsive">
-        <table id="usersByRoleTable" class="table users-table"></table>
+        <table id="usersByRoleTable" class="table users-table w-100"></table>
       </div>
     </div>
   </div>
