@@ -1,6 +1,6 @@
 <?php
 
-namespace VendorName\Skeleton\Database\Factories;
+namespace Idoneo\HumanoAccessControl\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 

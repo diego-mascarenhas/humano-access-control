@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Idoneo\HumanoAccessControl\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class HumanoAccessControlCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'humano-access-control';
 
     public $description = 'My command';
 
