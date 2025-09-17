@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', function ()
 		processing: true,
 		serverSide: false,
 		ajax: '{{ route('app-access-roles.users-data') }}',
-		columns: [
-			{ data: null, title: '{{ __('User') }}', render: function (row)
+        columns: [
+            { data: null, title: '{{ __('Usuario') }}', render: function (row)
 				{
 					return `<div class="d-flex align-items-center">
 						<div class="d-flex flex-column">
@@ -34,10 +34,10 @@ document.addEventListener('DOMContentLoaded', function ()
 					</div>`;
 				}
 			},
-			{ data: 'role', title: '{{ __('Role') }}' },
-			{ data: 'status', title: '{{ __('Status') }}', className: 'text-center', render: function (val)
+            { data: 'role', title: '{{ __('Rol') }}' },
+            { data: 'status', title: '{{ __('Estado') }}', className: 'text-center', render: function (val)
 				{
-					const map = { 'Active': 'bg-label-success', 'Pending': 'bg-label-warning', 'Inactive': 'bg-label-secondary' };
+                    const map = { 'Active': 'bg-label-success', 'Pending': 'bg-label-warning', 'Inactive': 'bg-label-secondary' };
 					return `<span class="badge ${map[val] || 'bg-label-secondary'}">${val}</span>`;
 				}
 			}
@@ -70,13 +70,13 @@ document.addEventListener('DOMContentLoaded', function ()
   <div class="col-xl-4 col-lg-6 col-md-6">
     <div class="card">
       <div class="card-body">
-        <div class="d-flex justify-content-between">
-          <h6 class="fw-normal mb-2">{{ __('Total') }} {{ $role['users_count'] }} {{ __('users') }}</h6>
+					<div class="d-flex justify-content-between">
+          <h6 class="fw-normal mb-2">{{ __('Total') }} {{ $role['users_count'] }} {{ __('usuarios') }}</h6>
         </div>
         <div class="d-flex justify-content-between align-items-end mt-1">
           <div class="role-heading">
             <h4 class="mb-1 text-capitalize">{{ $role['name'] }}</h4>
-            <small class="text-muted">{{ __('Permissions') }}: {{ $role['permissions_count'] }}</small>
+            <small class="text-muted">{{ __('Permisos') }}: {{ $role['permissions_count'] }}</small>
           </div>
           <a href="javascript:;" class="text-body role-edit-modal" data-role-id="{{ $role['id'] }}" data-role-name="{{ $role['name'] }}"><i class="ti ti-edit ti-md"></i></a>
         </div>
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function ()
 
   <div class="col-12">
     <div class="card mt-4">
-      <h5 class="card-header">{{ __('Users by role') }}</h5>
+      <h5 class="card-header">{{ __('Usuarios por rol') }}</h5>
       <div class="card-datatable table-responsive">
         <table id="usersByRoleTable" class="table users-table"></table>
       </div>
@@ -108,20 +108,20 @@ document.addEventListener('DOMContentLoaded', function ()
 				@csrf
 				<div class="modal-body">
 					<div class="text-center mb-4">
-						<h3 class="role-title mb-2">{{ __('Edit Role') }}</h3>
-						<p class="text-muted">{{ __('Set role permissions') }}</p>
+					<h3 class="role-title mb-2">{{ __('Editar rol') }}</h3>
+					<p class="text-muted">{{ __('Configurar permisos del rol') }}</p>
 					</div>
 					<div class="col-12 mb-4 fv-plugins-icon-container">
-						<label class="form-label" for="modalRoleName">{{ __('Role Name') }}</label>
-						<input type="text" id="modalRoleName" name="name" class="form-control" placeholder="{{ __('Enter a role name') }}" tabindex="-1" required>
+						<label class="form-label" for="modalRoleName">{{ __('Nombre del rol') }}</label>
+						<input type="text" id="modalRoleName" name="name" class="form-control" placeholder="{{ __('Ingresá un nombre de rol') }}" tabindex="-1" required>
 						<div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
 					</div>
-					<h6 class="mb-3 fw-bold">{{ __('Role Permissions') }}</h6>
+					<!-- Permissions table will be injected below -->
 					<div id="permissionsContainer" class="row g-3"></div>
 				</div>
-				<div class="modal-footer">
-					<button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
-					<button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+				<div class="col-12 text-center mt-4">
+					<button type="submit" class="btn btn-primary me-sm-3 me-1 waves-effect waves-light">{{ __('Guardar') }}</button>
+					<button type="button" class="btn btn-label-secondary waves-effect" data-bs-dismiss="modal" aria-label="Close">{{ __('Cancelar') }}</button>
 				</div>
 			</form>
 		</div>
@@ -151,72 +151,70 @@ document.addEventListener('DOMContentLoaded', function ()
 				nameInput.value = data.role.name;
 				container.innerHTML = '';
 
-				// Use list-group layout (Bootstrap/Vuexy) to mirror original style
-				const list = document.createElement('div');
-				list.className = 'list-group list-group-flush w-100';
+				// Build table per original style
+				const wrapper = document.createElement('div');
+				wrapper.className = 'col-12';
+					const title = document.createElement('h5');
+					title.textContent = `{{ __('Permisos del rol') }}`;
+				wrapper.appendChild(title);
+				const tableWrap = document.createElement('div');
+				tableWrap.className = 'table-responsive';
+				const table = document.createElement('table');
+				table.className = 'table table-flush-spacing';
+				const tbody = document.createElement('tbody');
 
 				// Header row: Administrator Access + Select All
-				const headerRow = document.createElement('div');
-				headerRow.className = 'list-group-item px-3 py-2';
-				headerRow.innerHTML = `
-					<div class="row g-0 align-items-center">
-						<div class="col-6 col-md-4 mb-2">
-							<span class="text-body">{{ __('Administrator Access') }}</span>
-							<i class="ti ti-info-circle ms-1 text-muted"></i>
+				const trHeader = document.createElement('tr');
+				trHeader.innerHTML = `
+					<td class="text-nowrap fw-medium">
+						{{ __('Acceso de administrador') }} <i class="ti ti-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="{{ __('Permite acceso completo al sistema') }}" title="{{ __('Permite acceso completo al sistema') }}"></i>
+					</td>
+					<td>
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" id="selectAll">
+							<label class="form-check-label" for="selectAll">{{ __('Seleccionar todo') }}</label>
 						</div>
-						<div class="col-6 col-md-8 d-flex align-items-center">
-							<label class="form-check mb-0">
-								<input class="form-check-input" type="checkbox" id="selectAllPerms">
-								<span class="form-check-label">{{ __('Select All') }}</span>
-							</label>
-						</div>
-					</div>
+					</td>
 				`;
-				list.appendChild(headerRow);
+				tbody.appendChild(trHeader);
 
 				data.modules.forEach((m, i) => {
-					const row = document.createElement('div');
-					row.className = 'list-group-item px-3 py-2';
-					row.innerHTML = `
-						<div class="row g-0 align-items-center">
-							<div class="col-6 col-md-4"><strong class="text-capitalize">${m.key}</strong></div>
-							<div class="col-6 col-md-8">
-								<div class="row g-0 align-items-center">
-									<div class="col-4">
-										<label class="form-check mb-0">
-											<input class="form-check-input module-read" type="checkbox" name="modules[${i}][read]" value="1" ${m.readChecked ? 'checked' : ''} id="read_${i}">
-											<span class="form-check-label">{{ __('Read') }}</span>
-											${(m.readPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][readPerms][]" value="${p}">`).join('')}
-										</label>
-									</div>
-									<div class="col-4">
-										<label class="form-check mb-0">
-											<input class="form-check-input module-write" type="checkbox" name="modules[${i}][write]" value="1" ${m.writeChecked ? 'checked' : ''} id="write_${i}">
-											<span class="form-check-label">{{ __('Write') }}</span>
-											${(m.writePerms||[]).map(p=>`<input type="hidden" name="modules[${i}][writePerms][]" value="${p}">`).join('')}
-										</label>
-									</div>
-									<div class="col-4">
-										<label class="form-check mb-0">
-											<input class="form-check-input module-create" type="checkbox" name="modules[${i}][create]" value="1" ${m.createChecked ? 'checked' : ''} id="create_${i}">
-											<span class="form-check-label">{{ __('Create') }}</span>
-											${(m.createPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][createPerms][]" value="${p}">`).join('')}
-										</label>
-									</div>
+					const tr = document.createElement('tr');
+					tr.innerHTML = `
+						<td class="text-nowrap fw-medium"><span class="text-capitalize">${m.key}</span></td>
+						<td>
+							<div class="d-flex">
+								<div class="form-check me-3 me-lg-5">
+									<input class="form-check-input module-read" type="checkbox" name="modules[${i}][read]" value="1" ${m.readChecked ? 'checked' : ''} id="read_${i}">
+									<label class="form-check-label" for="read_${i}">{{ __('Leer') }}</label>
+									${(m.readPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][readPerms][]" value="${p}">`).join('')}
+								</div>
+								<div class="form-check me-3 me-lg-5">
+									<input class="form-check-input module-write" type="checkbox" name="modules[${i}][write]" value="1" ${m.writeChecked ? 'checked' : ''} id="write_${i}">
+									<label class="form-check-label" for="write_${i}">{{ __('Escribir') }}</label>
+									${(m.writePerms||[]).map(p=>`<input type="hidden" name="modules[${i}][writePerms][]" value="${p}">`).join('')}
+								</div>
+								<div class="form-check">
+									<input class="form-check-input module-create" type="checkbox" name="modules[${i}][create]" value="1" ${m.createChecked ? 'checked' : ''} id="create_${i}">
+									<label class="form-check-label" for="create_${i}">{{ __('Crear') }}</label>
+									${(m.createPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][createPerms][]" value="${p}">`).join('')}
 								</div>
 							</div>
-						</div>
+						</td>
 					`;
-					list.appendChild(row);
+					tbody.appendChild(tr);
 				});
 
-				container.appendChild(list);
+				table.appendChild(tbody);
+				tableWrap.appendChild(table);
+				wrapper.appendChild(tableWrap);
+				container.appendChild(wrapper);
 
 				// Select All toggles
-				container.querySelector('#selectAllPerms')?.addEventListener('change', function(){
+				container.querySelector('#selectAll')?.addEventListener('change', function(){
 					const checked = this.checked;
 					container.querySelectorAll('input.form-check-input').forEach(el => {
-						if (el.id !== 'selectAllPerms') el.checked = checked;
+						if (el.id !== 'selectAll') el.checked = checked;
 					});
 				});
 				modal.show();
