@@ -3,10 +3,12 @@
 namespace Idoneo\HumanoAccessControl\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use App\Models\User;
 
 class RoleController
@@ -90,6 +92,43 @@ class RoleController
 		return response()->json([
 			'data' => $users,
 		]);
+	}
+
+	public function permissions(Role $role): JsonResponse
+	{
+		$allPermissions = Permission::query()->orderBy('name')->get()->pluck('name');
+		$assigned = $role->permissions()->pluck('name');
+
+		$items = $allPermissions->map(function ($name) use ($assigned)
+		{
+			return [
+				'name' => $name,
+				'assigned' => $assigned->contains($name),
+			];
+		});
+
+		return response()->json([
+			'role' => [
+				'id' => $role->id,
+				'name' => $role->name,
+			],
+			'permissions' => $items,
+		]);
+	}
+
+	public function update(Request $request, Role $role): JsonResponse
+	{
+		$data = $request->validate([
+			'name' => ['required', 'string', 'max:255'],
+			'permissions' => ['array'],
+			'permissions.*' => ['string'],
+		]);
+
+		$role->name = $data['name'];
+		$role->save();
+		$role->syncPermissions($data['permissions'] ?? []);
+
+		return response()->json(['success' => true]);
 	}
 }
 

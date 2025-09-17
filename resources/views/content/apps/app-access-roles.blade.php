@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function ()
             <h4 class="mb-1 text-capitalize">{{ $role['name'] }}</h4>
             <small class="text-muted">{{ __('Permissions') }}: {{ $role['permissions_count'] }}</small>
           </div>
-          <a href="javascript:;" class="text-body role-edit-modal"><i class="ti ti-edit ti-md"></i></a>
+          <a href="javascript:;" class="text-body role-edit-modal" data-role-id="{{ $role['id'] }}" data-role-name="{{ $role['name'] }}"><i class="ti ti-edit ti-md"></i></a>
         </div>
       </div>
     </div>
@@ -97,4 +97,79 @@ document.addEventListener('DOMContentLoaded', function ()
 <!--/ Role cards -->
 @endsection
 
+@push('modals')
+<div class="modal fade" id="roleEditModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">{{ __('Edit Role') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form id="roleEditForm" method="POST">
+				@csrf
+				<div class="modal-body">
+					<p class="text-muted mb-2">{{ __('Set role permissions') }}</p>
+					<div class="mb-3">
+						<label class="form-label">{{ __('Role Name') }}</label>
+						<input type="text" class="form-control" name="name" id="roleName" required>
+					</div>
+					<h6 class="mb-3">{{ __('Role Permissions') }}</h6>
+					<div id="permissionsContainer" class="row g-3"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
+					<button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+@endpush
 
+@push('scripts')
+<script>
+(function(){
+	const modalEl = document.getElementById('roleEditModal');
+	const modal = new bootstrap.Modal(modalEl);
+	const form = document.getElementById('roleEditForm');
+	const nameInput = document.getElementById('roleName');
+	const container = document.getElementById('permissionsContainer');
+	let currentRoleId = null;
+
+	$(document).on('click', '.role-edit-modal', function ()
+	{
+		currentRoleId = this.getAttribute('data-role-id');
+		const roleName = this.getAttribute('data-role-name') || '';
+		nameInput.value = roleName;
+		container.innerHTML = '<div class="text-muted">{{ __('Loading...') }}</div>';
+		fetch(`{{ url('app/access-roles') }}/${currentRoleId}/permissions`)
+			.then(r => r.json())
+			.then(data => {
+				nameInput.value = data.role.name;
+				container.innerHTML = '';
+				data.permissions.forEach((p, idx) => {
+					const col = document.createElement('div');
+					col.className = 'col-md-4';
+					col.innerHTML = `<div class="form-check">
+						<input class="form-check-input" type="checkbox" name="permissions[]" value="${p.name}" ${p.assigned ? 'checked' : ''} id="perm_${idx}">
+						<label class="form-check-label" for="perm_${idx}">${p.name}</label>
+					</div>`;
+					container.appendChild(col);
+				});
+				modal.show();
+			});
+	});
+
+	form.addEventListener('submit', function (e)
+	{
+		e.preventDefault();
+		const formData = new FormData(form);
+		fetch(`{{ url('app/access-roles') }}/${currentRoleId}`, {
+			method: 'POST',
+			headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+			body: formData
+		}).then(r => r.json()).then(() => { modal.hide(); location.reload(); });
+	});
+})();
+</script>
+@endpush
