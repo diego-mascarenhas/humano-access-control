@@ -102,13 +102,15 @@ document.addEventListener('DOMContentLoaded', function ()
 	<div class="modal-dialog modal-lg modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title">{{ __('Edit Role') }}</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<form id="roleEditForm" method="POST">
 				@csrf
 				<div class="modal-body">
-					<p class="text-muted mb-2">{{ __('Set role permissions') }}</p>
+					<div class="text-center mb-4">
+						<h3 class="role-title mb-2">{{ __('Edit Role') }}</h3>
+						<p class="text-muted">{{ __('Set role permissions') }}</p>
+					</div>
 					<div class="mb-3">
 						<label class="form-label">{{ __('Role Name') }}</label>
 						<input type="text" class="form-control" name="name" id="roleName" required>
