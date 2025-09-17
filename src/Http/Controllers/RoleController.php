@@ -131,26 +131,6 @@ class RoleController
 			{
 				$modules[$module]['createPerms'][] = $perm;
 			}
-
-	/**
-	 * Yajra DataTables: Roles list (name, users_count, permissions_count)
-	 */
-	public function listData(Request $request)
-	{
-		$query = Role::query()
-			->select(['id', 'name'])
-			->withCount('permissions')
-			->selectSub(
-				DB::table('model_has_roles')
-					->selectRaw('count(*)')
-					->whereColumn('model_has_roles.role_id', 'roles.id'),
-				'users_count'
-			)
-			->orderBy('name');
-
-		return DataTables::of($query)
-			->toJson();
-	}
 		}
 
 		// Compute checked flags
@@ -169,6 +149,25 @@ class RoleController
 			],
 			'modules' => $modules,
 		]);
+	}
+
+	/**
+	 * Yajra DataTables: Roles list (name, users_count, permissions_count)
+	 */
+	public function listData(Request $request)
+	{
+		$query = Role::query()
+			->select(['id', 'name'])
+			->withCount('permissions')
+			->selectSub(
+				DB::table('model_has_roles')
+					->selectRaw('count(*)')
+					->whereColumn('model_has_roles.role_id', 'roles.id'),
+				'users_count'
+			)
+			->orderBy('name');
+
+		return DataTables::of($query)->toJson();
 	}
 
 	public function update(Request $request, Role $role): JsonResponse
