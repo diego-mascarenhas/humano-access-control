@@ -96,23 +96,57 @@ class RoleController
 
 	public function permissions(Role $role): JsonResponse
 	{
-		$allPermissions = Permission::query()->orderBy('name')->get()->pluck('name');
+		$all = Permission::query()->orderBy('name')->pluck('name');
 		$assigned = $role->permissions()->pluck('name');
 
-		$items = $allPermissions->map(function ($name) use ($assigned)
+		// Group by module prefix (before the first dot)
+		$modules = [];
+		foreach ($all as $perm)
 		{
-			return [
-				'name' => $name,
-				'assigned' => $assigned->contains($name),
+			$parts = explode('.', $perm);
+			if (count($parts) < 2)
+			{
+				continue;
+			}
+			$module = $parts[0];
+			$action = $parts[1];
+
+			$modules[$module] = $modules[$module] ?? [
+				'key' => $module,
+				'readPerms' => [],
+				'writePerms' => [],
+				'createPerms' => [],
 			];
-		});
+
+			if (in_array($action, ['show', 'index', 'list', 'view']))
+			{
+				$modules[$module]['readPerms'][] = $perm;
+			}
+			if (in_array($action, ['show', 'edit', 'update', 'store']))
+			{
+				$modules[$module]['writePerms'][] = $perm;
+			}
+			if (in_array($action, ['create']))
+			{
+				$modules[$module]['createPerms'][] = $perm;
+			}
+		}
+
+		// Compute checked flags
+		$modules = array_values(array_map(function (array $m) use ($assigned)
+		{
+			$m['readChecked'] = ! empty($m['readPerms']) && collect($m['readPerms'])->every(fn ($p) => $assigned->contains($p));
+			$m['writeChecked'] = ! empty($m['writePerms']) && collect($m['writePerms'])->every(fn ($p) => $assigned->contains($p));
+			$m['createChecked'] = ! empty($m['createPerms']) && collect($m['createPerms'])->every(fn ($p) => $assigned->contains($p));
+			return $m;
+		}, $modules));
 
 		return response()->json([
 			'role' => [
 				'id' => $role->id,
 				'name' => $role->name,
 			],
-			'permissions' => $items,
+			'modules' => $modules,
 		]);
 	}
 
@@ -120,13 +154,36 @@ class RoleController
 	{
 		$data = $request->validate([
 			'name' => ['required', 'string', 'max:255'],
-			'permissions' => ['array'],
-			'permissions.*' => ['string'],
+			'modules' => ['array'],
+			'modules.*.read' => ['boolean'],
+			'modules.*.write' => ['boolean'],
+			'modules.*.create' => ['boolean'],
+			'modules.*.readPerms' => ['array'],
+			'modules.*.writePerms' => ['array'],
+			'modules.*.createPerms' => ['array'],
 		]);
 
 		$role->name = $data['name'];
 		$role->save();
-		$role->syncPermissions($data['permissions'] ?? []);
+
+		$permissionsToSync = [];
+		foreach (($data['modules'] ?? []) as $module)
+		{
+			if (! empty($module['read']))
+			{
+				$permissionsToSync = array_merge($permissionsToSync, $module['readPerms'] ?? []);
+			}
+			if (! empty($module['write']))
+			{
+				$permissionsToSync = array_merge($permissionsToSync, $module['writePerms'] ?? []);
+			}
+			if (! empty($module['create']))
+			{
+				$permissionsToSync = array_merge($permissionsToSync, $module['createPerms'] ?? []);
+			}
+		}
+
+		$role->syncPermissions(array_values(array_unique($permissionsToSync)));
 
 		return response()->json(['success' => true]);
 	}

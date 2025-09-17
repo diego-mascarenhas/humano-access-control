@@ -147,14 +147,34 @@ document.addEventListener('DOMContentLoaded', function ()
 			.then(data => {
 				nameInput.value = data.role.name;
 				container.innerHTML = '';
-				data.permissions.forEach((p, idx) => {
-					const col = document.createElement('div');
-					col.className = 'col-md-4';
-					col.innerHTML = `<div class="form-check">
-						<input class="form-check-input" type="checkbox" name="permissions[]" value="${p.name}" ${p.assigned ? 'checked' : ''} id="perm_${idx}">
-						<label class="form-check-label" for="perm_${idx}">${p.name}</label>
-					</div>`;
-					container.appendChild(col);
+				data.modules.forEach((m, i) => {
+					const row = document.createElement('div');
+					row.className = 'col-12';
+					row.innerHTML = `
+						<div class="row align-items-center">
+							<div class="col-md-4 mb-2"><strong class="text-capitalize">${m.key}</strong></div>
+							<div class="col-md-8">
+								<div class="d-flex gap-4">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" name="modules[${i}][read]" value="1" ${m.readChecked ? 'checked' : ''} id="read_${i}">
+										<label class="form-check-label" for="read_${i}">{{ __('Read') }}</label>
+										${(m.readPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][readPerms][]" value="${p}">`).join('')}
+									</div>
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" name="modules[${i}][write]" value="1" ${m.writeChecked ? 'checked' : ''} id="write_${i}">
+										<label class="form-check-label" for="write_${i}">{{ __('Write') }}</label>
+										${(m.writePerms||[]).map(p=>`<input type="hidden" name="modules[${i}][writePerms][]" value="${p}">`).join('')}
+									</div>
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" name="modules[${i}][create]" value="1" ${m.createChecked ? 'checked' : ''} id="create_${i}">
+										<label class="form-check-label" for="create_${i}">{{ __('Create') }}</label>
+										${(m.createPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][createPerms][]" value="${p}">`).join('')}
+									</div>
+								</div>
+							</div>
+						</div>
+					`;
+					container.appendChild(row);
 				});
 				modal.show();
 			});
