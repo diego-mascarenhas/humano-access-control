@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function ()
 
 				// Header row: Administrator Access + Select All
 				const headerRow = document.createElement('div');
-				headerRow.className = 'row g-0 align-items-center py-3 border-bottom';
+				headerRow.className = 'row g-0 align-items-center py-2 border-bottom';
 				headerRow.innerHTML = `
 					<div class="col-6 col-md-4 mb-2">
 						<strong>{{ __('Administrator Access') }}</strong>
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function ()
 					const row = document.createElement('div');
 					row.className = 'col-12';
 					row.innerHTML = `
-						<div class="row g-0 align-items-center py-3 border-bottom">
+						<div class="row g-0 align-items-center py-2 border-bottom">
 							<div class="col-6 col-md-4 mb-2"><strong class="text-capitalize">${m.key}</strong></div>
 							<div class="col-6 col-md-8">
 								<div class="row g-0">
