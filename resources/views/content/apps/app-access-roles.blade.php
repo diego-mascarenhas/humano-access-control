@@ -148,8 +148,8 @@ document.addEventListener('DOMContentLoaded', function ()
   <div class="col-12">
     <div class="card">
       <h5 class="card-header">{{ __('Roles') }}</h5>
-      <div class="table-responsive">
-        <table id="rolesTable" class="table border-top roles-table"></table>
+      <div class="card-datatable table-responsive">
+        <table id="rolesTable" class="table roles-table"></table>
       </div>
     </div>
   </div>
