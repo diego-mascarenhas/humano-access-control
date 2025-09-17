@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function ()
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
 	<div class="d-flex flex-column justify-content-center">
 		<h4 class="mb-1 mt-3"><span class="text-muted fw-light">{{ __('Roles & Permissions') }}/</span> {{ __('Permissions') }}</h4>
-		<p class="text-muted">{{ __('Manage application permissions and assignments') }}</p>
+		<p class="text-muted">{{ __('Gestiona los permisos de la aplicación y sus asignaciones') }}</p>
 	</div>
 </div>
 
