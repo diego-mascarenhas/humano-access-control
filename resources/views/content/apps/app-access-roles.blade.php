@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function ()
 						<label class="form-label">{{ __('Role Name') }}</label>
 						<input type="text" class="form-control" name="name" id="roleName" required>
 					</div>
-					<h6 class="mb-3">{{ __('Role Permissions') }}</h6>
+					<h6 class="mb-3 fw-bold">{{ __('Role Permissions') }}</h6>
 					<div id="permissionsContainer" class="row g-3"></div>
 				</div>
 				<div class="modal-footer">
@@ -154,11 +154,11 @@ document.addEventListener('DOMContentLoaded', function ()
 
 				// Header row: Administrator Access + Select All
 				const headerRow = document.createElement('div');
-				headerRow.className = 'list-group-item px-0 py-2';
+				headerRow.className = 'list-group-item px-3 py-2';
 				headerRow.innerHTML = `
 					<div class="row g-0 align-items-center">
 						<div class="col-6 col-md-4 mb-2">
-							<strong>{{ __('Administrator Access') }}</strong>
+							<span class="text-body">{{ __('Administrator Access') }}</span>
 							<i class="ti ti-info-circle ms-1 text-muted"></i>
 						</div>
 						<div class="col-6 col-md-8 d-flex align-items-center">
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function ()
 
 				data.modules.forEach((m, i) => {
 					const row = document.createElement('div');
-					row.className = 'list-group-item px-0 py-2';
+					row.className = 'list-group-item px-3 py-2';
 					row.innerHTML = `
 						<div class="row g-0 align-items-center">
 							<div class="col-6 col-md-4"><strong class="text-capitalize">${m.key}</strong></div>
