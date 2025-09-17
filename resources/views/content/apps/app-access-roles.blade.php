@@ -19,7 +19,15 @@ $configData = Helper::appClasses();
 <script>
 document.addEventListener('DOMContentLoaded', function ()
 {
-    $('.users-table').DataTable({
+    const tableId = '#usersByRoleTable';
+    let usersTable;
+    if ($.fn.DataTable.isDataTable(tableId))
+    {
+        usersTable = $(tableId).DataTable();
+    }
+    else
+    {
+        usersTable = $('.users-table').DataTable({
 		processing: true,
 		serverSide: false,
 		ajax: '{{ route('app-access-roles.users-data') }}',
@@ -54,7 +62,8 @@ document.addEventListener('DOMContentLoaded', function ()
             sSearch: 'Buscar',
             oPaginate: { sFirst: 'Primero', sLast: 'Último', sNext: 'Siguiente', sPrevious: 'Anterior' }
         }
-	});
+    });
+    }
 });
 </script>
 @endsection
@@ -91,8 +100,9 @@ document.addEventListener('DOMContentLoaded', function ()
                 column.search(val ? '^' + val + '$' : '', true, false).draw();
             });
         };
-        const t = $('#usersByRoleTable').DataTable();
-        t.on('init.dt', function(){ buildRoleFilter(t); });
+        const t = $.fn.DataTable.isDataTable(tableId) ? $(tableId).DataTable() : usersTable;
+        if (t.state && t.state.loaded) { buildRoleFilter(t); }
+        else { t.on('init.dt', function(){ buildRoleFilter(t); }); }
         // Add role button (minimal UX: prompt)
         document.getElementById('addRoleBtn').addEventListener('click', function(){
             const name = prompt('{{ __('Nombre del nuevo rol') }}');
