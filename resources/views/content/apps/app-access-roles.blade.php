@@ -147,34 +147,60 @@ document.addEventListener('DOMContentLoaded', function ()
 			.then(data => {
 				nameInput.value = data.role.name;
 				container.innerHTML = '';
+
+				// Header row: Administrator Access + Select All
+				const headerRow = document.createElement('div');
+				headerRow.className = 'row g-0 align-items-center pb-2';
+				headerRow.innerHTML = `
+					<div class="col-md-4 mb-2">
+						<strong>{{ __('Administrator Access') }}</strong>
+						<i class="ti ti-info-circle ms-1 text-muted"></i>
+					</div>
+					<div class="col-md-8">
+						<label class="form-check mb-0">
+							<input class="form-check-input" type="checkbox" id="selectAllPerms">
+							<span class="form-check-label">{{ __('Select All') }}</span>
+						</label>
+					</div>
+				`;
+				container.appendChild(headerRow);
+
 				data.modules.forEach((m, i) => {
 					const row = document.createElement('div');
 					row.className = 'col-12';
 					row.innerHTML = `
-						<div class="row align-items-center">
+						<div class="row g-0 align-items-center py-3 border-top">
 							<div class="col-md-4 mb-2"><strong class="text-capitalize">${m.key}</strong></div>
 							<div class="col-md-8">
-								<div class="d-flex gap-4">
-									<div class="form-check">
-										<input class="form-check-input" type="checkbox" name="modules[${i}][read]" value="1" ${m.readChecked ? 'checked' : ''} id="read_${i}">
-										<label class="form-check-label" for="read_${i}">{{ __('Read') }}</label>
+								<div class="d-flex justify-content-start gap-5">
+									<label class="form-check mb-0">
+										<input class="form-check-input module-read" type="checkbox" name="modules[${i}][read]" value="1" ${m.readChecked ? 'checked' : ''} id="read_${i}">
+										<span class="form-check-label">{{ __('Read') }}</span>
 										${(m.readPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][readPerms][]" value="${p}">`).join('')}
-									</div>
-									<div class="form-check">
-										<input class="form-check-input" type="checkbox" name="modules[${i}][write]" value="1" ${m.writeChecked ? 'checked' : ''} id="write_${i}">
-										<label class="form-check-label" for="write_${i}">{{ __('Write') }}</label>
+									</label>
+									<label class="form-check mb-0">
+										<input class="form-check-input module-write" type="checkbox" name="modules[${i}][write]" value="1" ${m.writeChecked ? 'checked' : ''} id="write_${i}">
+										<span class="form-check-label">{{ __('Write') }}</span>
 										${(m.writePerms||[]).map(p=>`<input type="hidden" name="modules[${i}][writePerms][]" value="${p}">`).join('')}
-									</div>
-									<div class="form-check">
-										<input class="form-check-input" type="checkbox" name="modules[${i}][create]" value="1" ${m.createChecked ? 'checked' : ''} id="create_${i}">
-										<label class="form-check-label" for="create_${i}">{{ __('Create') }}</label>
+									</label>
+									<label class="form-check mb-0">
+										<input class="form-check-input module-create" type="checkbox" name="modules[${i}][create]" value="1" ${m.createChecked ? 'checked' : ''} id="create_${i}">
+										<span class="form-check-label">{{ __('Create') }}</span>
 										${(m.createPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][createPerms][]" value="${p}">`).join('')}
-									</div>
+									</label>
 								</div>
 							</div>
 						</div>
 					`;
 					container.appendChild(row);
+				});
+
+				// Select All toggles
+				container.querySelector('#selectAllPerms')?.addEventListener('change', function(){
+					const checked = this.checked;
+					container.querySelectorAll('input.form-check-input').forEach(el => {
+						if (el.id !== 'selectAllPerms') el.checked = checked;
+					});
 				});
 				modal.show();
 			});
