@@ -112,24 +112,39 @@ class RoleController
 			$module = $parts[0];
 			$action = $parts[1];
 
+			// Compute human label (DB translations supported via app helper)
+			$label = \App\Helpers\TranslationHelper::transGroup($module, 'modules');
+			if ($label === 'modules.' . $module)
+			{
+				$label = ucfirst($module);
+			}
+
 			$modules[$module] = $modules[$module] ?? [
 				'key' => $module,
+				'label' => $label,
 				'readPerms' => [],
 				'writePerms' => [],
 				'createPerms' => [],
+				'deletePerms' => [],
 			];
 
 			if (in_array($action, ['show', 'index', 'list', 'view']))
 			{
 				$modules[$module]['readPerms'][] = $perm;
 			}
-			if (in_array($action, ['show', 'edit', 'update', 'store']))
+			// Update (write): only edit/update
+			if (in_array($action, ['edit', 'update']))
 			{
 				$modules[$module]['writePerms'][] = $perm;
 			}
-			if (in_array($action, ['create']))
+			// Create: create + store
+			if (in_array($action, ['create', 'store']))
 			{
 				$modules[$module]['createPerms'][] = $perm;
+			}
+			if (in_array($action, ['destroy', 'delete', 'remove']))
+			{
+				$modules[$module]['deletePerms'][] = $perm;
 			}
 		}
 
@@ -139,6 +154,7 @@ class RoleController
 			$m['readChecked'] = ! empty($m['readPerms']) && collect($m['readPerms'])->every(fn ($p) => $assigned->contains($p));
 			$m['writeChecked'] = ! empty($m['writePerms']) && collect($m['writePerms'])->every(fn ($p) => $assigned->contains($p));
 			$m['createChecked'] = ! empty($m['createPerms']) && collect($m['createPerms'])->every(fn ($p) => $assigned->contains($p));
+			$m['deleteChecked'] = ! empty($m['deletePerms']) && collect($m['deletePerms'])->every(fn ($p) => $assigned->contains($p));
 			return $m;
 		}, $modules));
 
@@ -181,6 +197,8 @@ class RoleController
 			'modules.*.readPerms' => ['array'],
 			'modules.*.writePerms' => ['array'],
 			'modules.*.createPerms' => ['array'],
+			'modules.*.delete' => ['boolean'],
+			'modules.*.deletePerms' => ['array'],
 		]);
 
 		$role->name = $data['name'];
@@ -200,6 +218,10 @@ class RoleController
 			if (! empty($module['create']))
 			{
 				$permissionsToSync = array_merge($permissionsToSync, $module['createPerms'] ?? []);
+			}
+			if (! empty($module['delete']))
+			{
+				$permissionsToSync = array_merge($permissionsToSync, $module['deletePerms'] ?? []);
 			}
 		}
 

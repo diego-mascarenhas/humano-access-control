@@ -222,12 +222,10 @@ document.addEventListener('DOMContentLoaded', function ()
 				table.className = 'table table-flush-spacing';
 				const tbody = document.createElement('tbody');
 
-				// Header row: Administrator Access + Select All
+				// Header row: Administrator Access (no tooltip) + Select All
 				const trHeader = document.createElement('tr');
 				trHeader.innerHTML = `
-					<td class="text-nowrap fw-medium">
-						{{ __('Acceso de administrador') }} <i class="ti ti-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="{{ __('Permite acceso completo al sistema') }}" title="{{ __('Permite acceso completo al sistema') }}"></i>
-					</td>
+					<td class="text-nowrap fw-medium">{{ __('Acceso de administrador') }}</td>
 					<td>
 						<div class="form-check">
 							<input class="form-check-input" type="checkbox" id="selectAll">
@@ -240,23 +238,28 @@ document.addEventListener('DOMContentLoaded', function ()
 				data.modules.forEach((m, i) => {
 					const tr = document.createElement('tr');
 					tr.innerHTML = `
-						<td class="text-nowrap fw-medium"><span class="text-capitalize">${m.key}</span></td>
+						<td class="text-nowrap fw-medium"><span class="text-capitalize">${m.label || m.key}</span></td>
 						<td>
-							<div class="d-flex">
-								<div class="form-check me-3 me-lg-5">
+							<div class="d-flex flex-wrap gap-3">
+								<div class="form-check me-lg-4">
 									<input class="form-check-input module-read" type="checkbox" name="modules[${i}][read]" value="1" ${m.readChecked ? 'checked' : ''} id="read_${i}">
 									<label class="form-check-label" for="read_${i}">{{ __('Leer') }}</label>
 									${(m.readPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][readPerms][]" value="${p}">`).join('')}
 								</div>
-								<div class="form-check me-3 me-lg-5">
-									<input class="form-check-input module-write" type="checkbox" name="modules[${i}][write]" value="1" ${m.writeChecked ? 'checked' : ''} id="write_${i}">
-									<label class="form-check-label" for="write_${i}">{{ __('Escribir') }}</label>
-									${(m.writePerms||[]).map(p=>`<input type="hidden" name="modules[${i}][writePerms][]" value="${p}">`).join('')}
-								</div>
-								<div class="form-check">
+								<div class="form-check me-lg-4">
 									<input class="form-check-input module-create" type="checkbox" name="modules[${i}][create]" value="1" ${m.createChecked ? 'checked' : ''} id="create_${i}">
 									<label class="form-check-label" for="create_${i}">{{ __('Crear') }}</label>
 									${(m.createPerms||[]).map(p=>`<input type="hidden" name="modules[${i}][createPerms][]" value="${p}">`).join('')}
+								</div>
+								<div class="form-check me-lg-4">
+									<input class="form-check-input module-write" type="checkbox" name="modules[${i}][write]" value="1" ${(m.updateChecked ?? m.writeChecked) ? 'checked' : ''} id="update_${i}">
+									<label class="form-check-label" for="update_${i}">{{ __('Actualizar') }}</label>
+									${(m.updatePerms||m.writePerms||[]).map(p=>`<input type=\"hidden\" name=\"modules[${i}][writePerms][]\" value=\"${p}\">`).join('')}
+								</div>
+								<div class="form-check">
+									<input class="form-check-input module-delete" type="checkbox" name="modules[${i}][delete]" value="1" ${m.deleteChecked ? 'checked' : ''} id="delete_${i}">
+									<label class="form-check-label" for="delete_${i}">{{ __('Eliminar') }}</label>
+									${(m.deletePerms||[]).map(p=>`<input type="hidden" name="modules[${i}][deletePerms][]" value="${p}">`).join('')}
 								</div>
 							</div>
 						</td>
