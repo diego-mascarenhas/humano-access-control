@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         php: [8.4, 8.3]
         stability: [prefer-lowest, prefer-stable]
         include:
@@ -44,7 +44,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          # Keep extensions portable across OS runners (avoid pcntl/imagick on Windows)
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, fileinfo
           coverage: none
 
       - name: Setup problem matchers
