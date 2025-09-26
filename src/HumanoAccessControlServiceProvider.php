@@ -2,9 +2,9 @@
 
 namespace Idoneo\HumanoAccessControl;
 
+use Idoneo\HumanoAccessControl\Commands\HumanoAccessControlCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Idoneo\HumanoAccessControl\Commands\HumanoAccessControlCommand;
 
 class HumanoAccessControlServiceProvider extends PackageServiceProvider
 {
@@ -23,5 +23,4 @@ class HumanoAccessControlServiceProvider extends PackageServiceProvider
             ->hasMigration('create_humano_access_control_table')
             ->hasCommand(HumanoAccessControlCommand::class);
     }
-
 }

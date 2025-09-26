@@ -2,9 +2,9 @@
 
 namespace Idoneo\HumanoAccessControl\Tests;
 
+use Idoneo\HumanoAccessControl\HumanoAccessControlServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Idoneo\HumanoAccessControl\HumanoAccessControlServiceProvider;
 
 class TestCase extends Orchestra
 {
