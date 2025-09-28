@@ -42,6 +42,7 @@ class HumanoAccessControlServiceProvider extends PackageServiceProvider
                         [
                             'name' => 'Access Control',
                             'icon' => 'ti ti-shield-lock',
+                            'description' => 'User roles and permissions management module',
                             'is_core' => false,
                             'status' => 1,
                         ]
@@ -52,6 +53,7 @@ class HumanoAccessControlServiceProvider extends PackageServiceProvider
                         [
                             'name' => 'Access Control',
                             'icon' => 'ti ti-shield-lock',
+                            'description' => 'User roles and permissions management module',
                             'is_core' => false,
                             'status' => 1,
                         ]
