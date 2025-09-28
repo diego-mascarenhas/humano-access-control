@@ -28,6 +28,7 @@ class RoleController
 
         /** @var string $viewName */
         $viewName = 'humano-access-control::content.apps.app-access-roles';
+
         return view($viewName, [
             'roles' => $roles,
         ]);
