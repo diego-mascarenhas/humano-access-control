@@ -45,7 +45,8 @@
     "autoload-dev": {
         "psr-4": {
             "Idoneo\\HumanoAccessControl\\Tests\\": "tests/",
-            "Workbench\\App\\": "workbench/app/"
+            "Workbench\\App\\": "workbench/app/",
+            "App\\": "tests/Fixtures/App/"
         }
     },
     "scripts": {

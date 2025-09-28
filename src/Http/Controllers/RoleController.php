@@ -2,10 +2,8 @@
 
 namespace Idoneo\HumanoAccessControl\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -16,18 +14,14 @@ class RoleController
     public function index(): View
     {
         $roles = Role::query()
-            ->withCount('permissions')
+            ->withCount(['permissions', 'users'])
             ->orderBy('name')
             ->get()
             ->map(function (Role $role) {
-                $usersCount = DB::table('model_has_roles')
-                    ->where('role_id', $role->id)
-                    ->count();
-
                 return [
                     'id' => $role->id,
                     'name' => $role->name,
-                    'users_count' => $usersCount,
+                    'users_count' => $role->users_count,
                     'permissions_count' => $role->permissions_count,
                 ];
             });
@@ -40,18 +34,14 @@ class RoleController
     public function data(): JsonResponse
     {
         $roles = Role::query()
-            ->withCount('permissions')
+            ->withCount(['permissions', 'users'])
             ->orderBy('name')
             ->get()
             ->map(function (Role $role) {
-                $usersCount = DB::table('model_has_roles')
-                    ->where('role_id', $role->id)
-                    ->count();
-
                 return [
                     'id' => $role->id,
                     'name' => $role->name,
-                    'users_count' => $usersCount,
+                    'users_count' => $role->users_count,
                     'permissions_count' => $role->permissions_count,
                 ];
             });
@@ -63,22 +53,21 @@ class RoleController
 
     public function usersData(): JsonResponse
     {
-        $users = User::query()
+        /** @var \Illuminate\Database\Eloquent\Builder $usersQuery */
+        $usersQuery = \App\Models\User::query();
+        $users = $usersQuery
             ->with('roles:id,name')
             ->orderBy('name')
-            ->get()
-            ->map(function (User $user) {
-                $status = 'Pending';
-                if ($user->deleted_at) {
-                    $status = 'Inactive';
-                } elseif ($user->email_verified_at) {
-                    $status = 'Active';
-                }
+            ->get(['id', 'name', 'email', 'deleted_at', 'email_verified_at'])
+            ->map(function ($user): array {
+                $deleted = data_get($user, 'deleted_at');
+                $verified = data_get($user, 'email_verified_at');
+                $status = $deleted ? 'Inactive' : ($verified ? 'Active' : 'Pending');
 
                 return [
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->roles->pluck('name')->first() ?? '-',
+                    'name' => (string) data_get($user, 'name', ''),
+                    'email' => (string) data_get($user, 'email', ''),
+                    'role' => (string) data_get($user, 'roles.0.name', '-'),
                     'status' => $status,
                 ];
             });
@@ -160,13 +149,7 @@ class RoleController
     {
         $query = Role::query()
             ->select(['id', 'name'])
-            ->withCount('permissions')
-            ->selectSub(
-                DB::table('model_has_roles')
-                    ->selectRaw('count(*)')
-                    ->whereColumn('model_has_roles.role_id', 'roles.id'),
-                'users_count'
-            )
+            ->withCount(['permissions', 'users'])
             ->orderBy('name');
 
         return DataTables::of($query)->toJson();

@@ -25,7 +25,10 @@ class PermissionController
                     return '<span class="text-muted">-</span>';
                 }
 
-                return $permission->roles->map(function ($role) {
+                /** @var \Illuminate\Support\Collection<int,\Spatie\Permission\Models\Role> $roles */
+                $roles = $permission->roles;
+
+                return $roles->map(function (\Spatie\Permission\Models\Role $role) {
                     return '<span class="badge bg-label-secondary me-1">'.e($role->name).'</span>';
                 })->implode(' ');
             })
