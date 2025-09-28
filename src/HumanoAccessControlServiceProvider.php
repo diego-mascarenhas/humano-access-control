@@ -37,7 +37,7 @@ class HumanoAccessControlServiceProvider extends PackageServiceProvider
             if (Schema::hasTable('modules')) {
                 // Register module if not present (works with/without host App\Models\Module)
                 if (class_exists(\App\Models\Module::class)) {
-                    \App\Models\Module::firstOrCreate(
+                    \App\Models\Module::updateOrCreate(
                         ['key' => 'access-control'],
                         [
                             'name' => 'Access Control',
