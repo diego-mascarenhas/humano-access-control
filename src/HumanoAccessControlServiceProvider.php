@@ -44,6 +44,8 @@ class HumanoAccessControlServiceProvider extends PackageServiceProvider
                             'icon' => 'ti ti-shield-lock',
                             'description' => 'User roles and permissions management module',
                             'is_core' => false,
+                            'group' => null,  // General Management (no group)
+                            'order' => 6,
                             'status' => 1,
                         ]
                     );
